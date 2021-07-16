@@ -89,13 +89,13 @@ describe('UserService', () => {
 			const user = await createUser(userService);
 			delete user.password;
 			const newUserData = UserFactory.buildOne();
-			expect(await userService.update(user.id, newUserData)).toMatchObject(newUserData);
+			expect(await userService.update({ id: user.id }, newUserData)).toMatchObject(newUserData);
 		});
 
 		it('Should not update an invalid user', async () => {
 			const newUserData = UserFactory.buildOne();
 			try {
-				await userService.update('invalid_user', newUserData);
+				await userService.update({ id: 'invalid_user' }, newUserData);
 			} catch (e) {
 				expect(e).toBeInstanceOf(Error);
 			}

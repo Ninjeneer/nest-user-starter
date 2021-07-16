@@ -23,20 +23,17 @@ export class UserService {
 		return await this.prisma.user.findUnique({ where: { id } });
 	}
 
-	async findOneByEmail(email: string): Promise<User> {
-		return await this.prisma.user.findUnique({ where: { email } });
+	async findOneByEmail(where: Prisma.UserWhereUniqueInput): Promise<User> {
+		return await this.prisma.user.findUnique({ where });
 	}
 
-	async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+	async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {
 		// If the password is changed, hash it
-		if (updateUserDto.password) {
-			updateUserDto.password = this.securityService.hashPassword(updateUserDto.password);
+		if (data.password) {
+			data.password = this.securityService.hashPassword(data.password.toString());
 		}
 		// Update the user
-		return await this.prisma.user.update({
-			where: { id },
-			data: updateUserDto
-		});
+		return await this.prisma.user.update({ where, data });
 	}
 
 	async remove(id: string): Promise<User> {
