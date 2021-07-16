@@ -1,7 +1,7 @@
 import { Prisma, User } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -13,19 +13,22 @@ export class UserService {
 		return user;
 	}
 
-	findAll() {
-		return `This action returns all user`;
+	async findAll() {
+		return await this.prisma.user.findMany();
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} user`;
+	async findOne(id: string) {
+		return await this.prisma.user.findUnique({ where: { id } });
 	}
 
-	update(id: number, updateUserDto: UpdateUserDto) {
-		return `This action updates a #${id} user`;
+	async update(id: string, updateUserDto: UpdateUserDto) {
+		return await this.prisma.user.update({
+			where: { id },
+			data: updateUserDto
+		});
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} user`;
+	async remove(id: string) {
+		return await this.prisma.user.delete({ where: { id } });
 	}
 }
