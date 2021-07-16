@@ -10,6 +10,7 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
+	@UseGuards()
 	async create(@Req() request: Request, @Body() createUserDto: Prisma.UserCreateInput) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
