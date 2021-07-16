@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Request } from 'express';
-import { TokenGuard } from 'src/token.guard';
+import { TokenGuard } from '../token.guard';
 import { UserService } from './user.service';
 
 @Controller('users')
-@UseGuards(new TokenGuard())
+@UseGuards(TokenGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 

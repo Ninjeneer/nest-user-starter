@@ -4,8 +4,9 @@ import { UserService } from './user/user.service';
 
 @Injectable()
 export class TokenGuard implements CanActivate {
-	@Inject()
-	private userService: UserService
+
+	constructor(private userService: UserService) {
+	}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request: Request = context.switchToHttp().getRequest();
