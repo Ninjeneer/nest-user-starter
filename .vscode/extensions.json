@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "prisma.prisma",
+        "redhat.vscode-yaml",
+        "editorconfig.editorconfig"
+    ]
+}
