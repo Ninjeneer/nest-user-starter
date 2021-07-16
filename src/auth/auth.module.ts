@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { SecurityModule } from 'src/security/security.module';
+import { SecurityModule } from '../security/security.module';
 import { UserModule } from '../user/user.module';
 
 @Module({

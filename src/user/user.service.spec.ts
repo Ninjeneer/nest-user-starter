@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../prisma.service';
+import { SecurityModule } from '../security/security.module';
 import { User } from '@prisma/client';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';
@@ -14,6 +15,7 @@ async function createUser(userService: UserService) {
 		email: user.email,
 		password: user.password
 	});
+	delete user.password;
 	expect(createdUser).toMatchObject(user);
 	createdUsers.push(createdUser);
 	return createdUser;
@@ -24,6 +26,7 @@ describe('UserService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [SecurityModule],
 			providers: [UserService, PrismaService]
 		}).compile();
 
@@ -72,7 +75,8 @@ describe('UserService', () => {
 	describe('find', () => {
 		it('Should find the created user', async () => {
 			const user = await createUser(userService);
-			expect(await userService.findOne(user.id)).toEqual(user);
+			delete user.password;
+			expect(await userService.findOne(user.id)).toMatchObject(user);
 		});
 
 		it('Should not find an invalid user', async () => {
@@ -83,10 +87,9 @@ describe('UserService', () => {
 	describe('update', () => {
 		it('Should update the created user', async () => {
 			const user = await createUser(userService);
+			delete user.password;
 			const newUserData = UserFactory.buildOne();
-			expect(await userService.update(user.id, newUserData)).toMatchObject(
-				newUserData
-			);
+			expect(await userService.update(user.id, newUserData)).toMatchObject(newUserData);
 		});
 
 		it('Should not update an invalid user', async () => {
