@@ -6,6 +6,7 @@ import { SecurityModule } from '../security/security.module';
 import UserFactory from '../user/user.factory';
 import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
+import { TokenModule } from '../token/token.module';
 
 describe('AuthService', () => {
 	let authService: AuthService;
@@ -13,7 +14,7 @@ describe('AuthService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [UserModule, AuthModule, SecurityModule],
+			imports: [UserModule, AuthModule, SecurityModule, TokenModule],
 			providers: [AuthService]
 		}).compile();
 
