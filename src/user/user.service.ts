@@ -26,6 +26,10 @@ export class UserService {
 		return await this.prisma.user.findUnique({ where });
 	}
 
+	async findOneByToken(where: Prisma.UserWhereInput): Promise<User> {
+		return await this.prisma.user.findFirst({ where });
+	}
+
 	async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {
 		// If the password is changed, hash it
 		if (data.password) {
