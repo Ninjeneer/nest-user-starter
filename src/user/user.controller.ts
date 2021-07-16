@@ -1,13 +1,4 @@
-import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Patch,
-	Post,
-	Req
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,8 +9,10 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
-	create(@Req() request: Request, @Body() createUserDto: CreateUserDto) {
-		return this.userService.create({ ip: request.ip, ...createUserDto });
+	async create(@Req() request: Request, @Body() createUserDto: CreateUserDto) {
+		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
+		delete user.password;
+		return user;
 	}
 
 	@Get()

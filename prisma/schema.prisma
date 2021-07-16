@@ -11,8 +11,18 @@ generator client {
 }
 
 model User {
-	id 	String	@id @default(uuid())
-	email	String	@unique
+	id 	      String	@id @default(uuid())
+	email	    String	@unique
 	password	String
-	ip	String?
+	ip	      String?
+	tokens	  Token[]
+}
+
+model Token {
+	id	      String	@id @default(uuid())
+	value	    String	@unique
+	createdAt	DateTime
+	expiresAt	DateTime?
+	userID	  String
+	user	    User	@relation(fields: [userID], references: [id])
 }
