@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { Request } from 'express';
 import { UserService } from './user/user.service';
 
@@ -15,12 +15,17 @@ export class TokenGuard implements CanActivate {
 		// Check header presence
 		if (authorization) {
 			// Extract token
-			const token = authorization.replace(new RegExp(/Bearer /i), '');
+			const token = authorization.replace(new RegExp(/Bearer /i), '').trim();
 			// Retrieve user based on provided token
 			const user = await this.userService.findOneByToken({ tokens: { some: { value: token } } });
-			return !!user;
+			if (!user) {
+				throw new UnauthorizedException();
+			} else {
+				Object.assign(request, { token });
+				return true;
+			}
 		} else {
-			return false;
+			throw new UnauthorizedException();
 		}
 	}
 }

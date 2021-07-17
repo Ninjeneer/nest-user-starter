@@ -76,11 +76,11 @@ describe('UserService', () => {
 		it('Should find the created user', async () => {
 			const user = await createUser(userService);
 			delete user.password;
-			expect(await userService.findOne(user.id)).toMatchObject(user);
+			expect(await userService.findOne({ id: user.id })).toMatchObject(user);
 		});
 
 		it('Should not find an invalid user', async () => {
-			expect(await userService.findOne('invalid_id')).toBeNull;
+			expect(await userService.findOne({ id: 'invalid_id' })).toBeNull;
 		});
 	});
 
@@ -106,7 +106,7 @@ describe('UserService', () => {
 		it('Should delete the created user', async () => {
 			const user = await createUser(userService);
 			expect(await userService.remove(user.id)).toMatchObject(user);
-			expect(await userService.findOne(user.id)).toBeNull;
+			expect(await userService.findOne({ id: user.id })).toBeNull;
 		});
 
 		it('Should not delete an invalid user', async () => {

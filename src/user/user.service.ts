@@ -2,15 +2,23 @@ import { Prisma, User } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { SecurityService } from '..//security/security.service';
+import { SecurityService } from '../security/security.service';
+import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 
 @Injectable()
 export class UserService {
 	constructor(private prisma: PrismaService, private securityService: SecurityService) {}
 
 	async create(createUserDto: Prisma.UserCreateInput): Promise<User> {
+		// Check for existing user
+		let user = await this.prisma.user.findUnique({ where: { email: createUserDto.email }});
+		if (user) {
+			throw new EmailAlreadyUsedException();
+		}
+		// Hash password
 		createUserDto.password = this.securityService.hashPassword(createUserDto.password);
-		const user = await this.prisma.user.create({ data: createUserDto });
+		// Create user
+		user = await this.prisma.user.create({ data: createUserDto });
 		return user;
 	}
 
@@ -18,8 +26,8 @@ export class UserService {
 		return await this.prisma.user.findMany();
 	}
 
-	async findOne(id: string): Promise<User> {
-		return await this.prisma.user.findUnique({ where: { id } });
+	async findOne(where: Prisma.UserWhereUniqueInput): Promise<User> {
+		return await this.prisma.user.findUnique({ where });
 	}
 
 	async findOneByEmail(where: Prisma.UserWhereUniqueInput): Promise<User> {

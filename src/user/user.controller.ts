@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Request } from 'express';
+import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { TokenGuard } from '../token.guard';
 import { UserService } from './user.service';
 
@@ -24,11 +25,22 @@ export class UserController {
 
 	@Get(':id')
 	findOne(@Param('id') id: string) {
-		return this.userService.findOne(id);
+		return this.userService.findOne({ id });
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+	async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+		const user = await this.userService.findOne({ id });
+		if (!user) {
+			throw new NotFoundException();
+		}
+		// Avoid taking someone else email
+		if (updateUserDto.email && user.email !== updateUserDto.email) {
+			const otherUser = await this.userService.findOne({ email: updateUserDto.email.toString() });
+			if (otherUser) {
+				throw new EmailAlreadyUsedException();
+			}
+		}
 		return this.userService.update({ id }, updateUserDto);
 	}
 
