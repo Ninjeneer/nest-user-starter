@@ -13,7 +13,7 @@ export class AuthService {
 	) {}
 
 	async validateUser(email: string, password: string): Promise<Partial<User>> {
-		let user = await this.userService.findOneByEmail({ email });
+		let user = await this.userService.findOneByEmail(email);
 		if (user && this.securityService.comparePasswords(password, user.password)) {
 			// Generate a token for the user
 			user = await this.userService.update({ id: user.id }, { tokens: { create: [this.tokenService.create()] } });

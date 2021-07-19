@@ -1,9 +1,9 @@
 import { Prisma, User } from '@prisma/client';
 
+import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
-import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 
 @Injectable()
 export class UserService {
@@ -11,7 +11,7 @@ export class UserService {
 
 	async create(createUserDto: Prisma.UserCreateInput): Promise<User> {
 		// Check for existing user
-		let user = await this.prisma.user.findUnique({ where: { email: createUserDto.email }});
+		let user = await this.prisma.user.findUnique({ where: { email: createUserDto.email } });
 		if (user) {
 			throw new EmailAlreadyUsedException();
 		}
@@ -30,12 +30,12 @@ export class UserService {
 		return await this.prisma.user.findUnique({ where });
 	}
 
-	async findOneByEmail(where: Prisma.UserWhereUniqueInput): Promise<User> {
-		return await this.prisma.user.findUnique({ where });
+	async findOneByEmail(email: string): Promise<User> {
+		return await this.prisma.user.findUnique({ where: { email } });
 	}
 
-	async findOneByToken(where: Prisma.UserWhereInput): Promise<User> {
-		return await this.prisma.user.findFirst({ where });
+	async findOneByToken(token: string): Promise<User> {
+		return await this.prisma.user.findFirst({ where: { tokens: { some: { value: token } } } });
 	}
 
 	async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {

@@ -7,7 +7,6 @@ import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
-
 	constructor(private userService: UserService, private tokenService: TokenService) {}
 
 	@UseGuards(AuthGuard('local'))
@@ -24,7 +23,7 @@ export class AuthController {
 	@Post('logout')
 	@UseGuards(TokenGuard)
 	async logout(@Req() request: Request) {
-		const user = this.userService.findOneByToken({ tokens: { some: { value: request.token }}});
+		this.userService.findOneByToken(request.token);
 		this.tokenService.revoke({ value: request.token });
 	}
 }
