@@ -1,17 +1,18 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Request } from 'express';
+import { RoleGuard } from '../guards/role.guard';
+import { Roles } from '../decorators/roles.decorator';
 import { EmailAlreadyUsedException } from '../exceptions/exceptions';
-import { TokenGuard } from '../token.guard';
-import { UserService } from './user.service';
+import { TokenGuard } from '../guards/token.guard';
+import { UserRole, UserService } from './user.service';
 
 @Controller('users')
-@UseGuards(TokenGuard)
+@UseGuards(TokenGuard, RoleGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
-	@UseGuards()
 	async create(@Req() request: Request, @Body() createUserDto: Prisma.UserCreateInput) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
@@ -19,7 +20,8 @@ export class UserController {
 	}
 
 	@Get()
-	findAll() {
+	@Roles(UserRole.ADMIN)
+	findAll(@Req() request) {
 		return this.userService.findAll();
 	}
 

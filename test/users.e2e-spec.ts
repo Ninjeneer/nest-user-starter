@@ -9,7 +9,9 @@ chai.use(chaiSubset);
 const BASE_URL = 'http://localhost:3000';
 const httpClient = new HttpClient(BASE_URL);
 
-describe('UserController (e2e)', () => {
+describe('UserController (e2e)', function () {
+	this.timeout(500000);
+
 	before(async () => {
 		const response = await httpClient.post<any>('/auth/login', { email: 'test@test.com', password: 'Azerty123!' });
 		if (response.status === HttpStatus.OK) {
@@ -22,9 +24,8 @@ describe('UserController (e2e)', () => {
 		expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
 	});
 
-	it('Should be able to retrieve user list (/users)', async () => {
+	it('Should not be able to retrieve user list as basic user (/users)', async () => {
 		const response = await httpClient.get('/users');
-		expect(response.status).to.be.eq(HttpStatus.OK);
-		expect(response.body).to.be.instanceOf(Array);
+		expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 	});
 });

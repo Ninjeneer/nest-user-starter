@@ -1,7 +1,7 @@
 import { Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import { TokenGuard } from '../token.guard';
+import { TokenGuard } from '../guards/token.guard';
 import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
 
@@ -24,7 +24,6 @@ export class AuthController {
 	@Post('logout')
 	@UseGuards(TokenGuard)
 	async logout(@Req() request: Request) {
-		this.userService.findOneByToken(request.token);
 		this.tokenService.revoke({ value: request.token });
 	}
 }

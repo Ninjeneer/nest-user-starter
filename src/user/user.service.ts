@@ -5,6 +5,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
 
+export enum UserRole {
+	BASIC = 'basic',
+	ADMIN = 'admin'
+}
+
 @Injectable()
 export class UserService {
 	constructor(private prisma: PrismaService, private securityService: SecurityService) {}

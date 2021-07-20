@@ -1,14 +1,7 @@
-import {
-	CanActivate,
-	ExecutionContext,
-	Inject,
-	Injectable,
-	UnauthorizedException,
-	UseInterceptors
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { Request } from 'express';
-import { UserService } from './user/user.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class TokenGuard implements CanActivate {
@@ -27,7 +20,7 @@ export class TokenGuard implements CanActivate {
 			if (!user) {
 				throw new UnauthorizedException();
 			} else {
-				Object.assign(request, { token });
+				Object.assign(request, { user });
 				return true;
 			}
 		} else {

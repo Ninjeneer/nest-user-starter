@@ -17,7 +17,7 @@ export default class HttpClient {
 
 	private buildHeaders() {
 		return {
-			Authorization: this.token ? 'Bearer ' + this.token : ''
+			authorization: this.token ? 'Bearer ' + this.token : ''
 		};
 	}
 
