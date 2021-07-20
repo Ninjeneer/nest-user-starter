@@ -17,9 +17,10 @@ chai.use(chaiSubset);
 describe('AuthService', () => {
 	let authService: AuthService;
 	let userService: UserService;
+	let module: TestingModule;
 
 	beforeEach(async () => {
-		const module: TestingModule = await Test.createTestingModule({
+		module = await Test.createTestingModule({
 			imports: [UserModule, AuthModule, SecurityModule, TokenModule],
 			providers: [AuthService]
 		}).compile();
@@ -27,6 +28,8 @@ describe('AuthService', () => {
 		authService = module.get<AuthService>(AuthService);
 		userService = module.get<UserService>(UserService);
 	});
+
+	afterEach(async () => await module.close());
 
 	it('should be defined', () => {
 		expect(authService).to.not.be.null;

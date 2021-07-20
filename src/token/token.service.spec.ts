@@ -12,19 +12,22 @@ import chaiSubset from 'chai-subset';
 chai.use(chaiSubset);
 
 describe('TokenService', () => {
-  let tokenService: TokenService;
+	let tokenService: TokenService;
+	let module: TestingModule;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [TokenService, PrismaService],
-    }).compile();
+	beforeEach(async () => {
+		module = await Test.createTestingModule({
+			providers: [TokenService, PrismaService]
+		}).compile();
 
-    tokenService = module.get<TokenService>(TokenService);
-  });
+		tokenService = module.get<TokenService>(TokenService);
+	});
 
-  it('should be defined', () => {
-    expect(tokenService).to.not.be.null;
-  });
+	afterEach(async () => await module.close());
+
+	it('should be defined', () => {
+		expect(tokenService).to.not.be.null;
+	});
 
 	it('Shoud create a token without expiracy', () => {
 		const token = tokenService.create();

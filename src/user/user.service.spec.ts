@@ -9,7 +9,7 @@ import { User } from '@prisma/client';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';
 import { assert } from 'console';
-import chaiSubset from 'chai-subset'
+import chaiSubset from 'chai-subset';
 
 chai.use(chaiSubset);
 
@@ -29,9 +29,10 @@ async function createUser(userService: UserService) {
 
 describe('UserService', () => {
 	let userService: UserService;
+	let module: TestingModule;
 
 	beforeEach(async () => {
-		const module: TestingModule = await Test.createTestingModule({
+		module = await Test.createTestingModule({
 			imports: [SecurityModule],
 			providers: [UserService, PrismaService]
 		}).compile();
@@ -45,8 +46,8 @@ describe('UserService', () => {
 				await userService.remove(user.id);
 			} catch (e) {}
 		}
+		await module.close();
 	});
-
 	it('should be defined', () => {
 		expect(userService).to.not.be.null;
 	});
