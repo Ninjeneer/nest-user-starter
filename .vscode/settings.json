@@ -3,5 +3,6 @@
 	"mochaExplorer.exit": true,
     "editor.codeActionsOnSave": {
         "source.fixAll": true,
-    }
+    },
+	"js/ts.implicitProjectConfig.experimentalDecorators": true
 }

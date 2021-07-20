@@ -10,13 +10,21 @@ const BASE_URL = 'http://localhost:3000';
 const httpClient = new HttpClient(BASE_URL);
 
 describe('UserController (e2e)', () => {
+	before(async () => {
+		const response = await httpClient.post<any>('/auth/login', { email: 'test@test.com', password: 'Azerty123!' });
+		if (response.status === HttpStatus.OK) {
+			httpClient.setToken(response.body.token);
+		}
+	});
+
 	it('Should not be able to retrieve user list (/users)', async () => {
-		const response = await httpClient.get('/users');
+		const response = await httpClient.withoutToken().get('/users');
 		expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
 	});
 
 	it('Should be able to retrieve user list (/users)', async () => {
 		const response = await httpClient.get('/users');
-		expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
+		expect(response.status).to.be.eq(HttpStatus.OK);
+		expect(response.body).to.be.instanceOf(Array);
 	});
 });
