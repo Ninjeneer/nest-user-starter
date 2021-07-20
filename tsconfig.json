@@ -16,7 +16,8 @@
 			"types",
 			"./node_modules/@types"
 		],
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"resolveJsonModule": true
   },
 	"include": [
 		"src",

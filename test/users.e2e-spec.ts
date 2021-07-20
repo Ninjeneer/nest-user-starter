@@ -2,12 +2,12 @@ import chai, { expect } from 'chai';
 
 import HttpClient from './HttpClient';
 import { HttpStatus } from '@nestjs/common';
+import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
 
 chai.use(chaiSubset);
 
-const BASE_URL = 'http://localhost:3000';
-const httpClient = new HttpClient(BASE_URL);
+const httpClient = new HttpClient(Utils.buildServerURL());
 
 describe('UserController (e2e)', function () {
 	this.timeout(500000);

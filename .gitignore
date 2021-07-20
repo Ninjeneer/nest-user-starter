@@ -41,3 +41,6 @@ package-lock.json
 
 # Mochawesome
 outputs/
+
+# Assets
+src/assets/config.json

@@ -15,6 +15,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "mocha": "mocha -r ts-node/register --reporter mochawesome --reporter-options json=false --exit",
+    "mocha:e2e": "mocha -r ts-node/register test/**/*spec.ts --reporter mochawesome --reporter-options json=false --exit",
 		"mocha:cov": "nyc --reporter=text mocha",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
