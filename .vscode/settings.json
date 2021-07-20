@@ -1,4 +1,6 @@
 {
+	"mochaExplorer.files": ["src/**/*spec.ts", "test/**/*spec.ts"],
+	"mochaExplorer.exit": true,
     "editor.codeActionsOnSave": {
         "source.fixAll": true,
     }

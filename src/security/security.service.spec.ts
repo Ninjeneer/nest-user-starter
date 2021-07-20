@@ -1,5 +1,9 @@
+import 'mocha';
+
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { SecurityService } from './security.service';
+import { expect } from 'chai';
 
 describe('SecurityService', () => {
   let service: SecurityService;
@@ -13,6 +17,6 @@ describe('SecurityService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(service).to.not.be.null;
   });
 });

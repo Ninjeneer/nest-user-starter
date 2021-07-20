@@ -1,4 +1,7 @@
+import 'mocha';
+
 import { Test, TestingModule } from '@nestjs/testing';
+import chai, { expect } from 'chai';
 
 import { PrismaService } from '../prisma.service';
 import { SecurityModule } from '../security/security.module';
@@ -6,6 +9,9 @@ import { User } from '@prisma/client';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';
 import { assert } from 'console';
+import chaiSubset from 'chai-subset'
+
+chai.use(chaiSubset);
 
 const createdUsers: User[] = [];
 
@@ -16,7 +22,7 @@ async function createUser(userService: UserService) {
 		password: user.password
 	});
 	delete user.password;
-	expect(createdUser).toMatchObject(user);
+	expect(createdUser).containSubset(user);
 	createdUsers.push(createdUser);
 	return createdUser;
 }
@@ -33,7 +39,7 @@ describe('UserService', () => {
 		userService = module.get<UserService>(UserService);
 	});
 
-	afterAll(async () => {
+	afterEach(async () => {
 		for (const user of createdUsers) {
 			try {
 				await userService.remove(user.id);
@@ -42,12 +48,12 @@ describe('UserService', () => {
 	});
 
 	it('should be defined', () => {
-		expect(userService).toBeDefined();
+		expect(userService).to.not.be.null;
 	});
 
 	describe('findAll', () => {
 		it('Should return an array of users', async () => {
-			expect(await userService.findAll()).toBeInstanceOf(Array);
+			expect(await userService.findAll()).to.be.instanceOf(Array);
 		});
 	});
 
@@ -67,7 +73,7 @@ describe('UserService', () => {
 				});
 				assert(false);
 			} catch (e) {
-				expect(e).toBeInstanceOf(Error);
+				expect(e).to.be.instanceOf(Error);
 			}
 		});
 	});
@@ -76,11 +82,11 @@ describe('UserService', () => {
 		it('Should find the created user', async () => {
 			const user = await createUser(userService);
 			delete user.password;
-			expect(await userService.findOne({ id: user.id })).toMatchObject(user);
+			expect(await userService.findOne({ id: user.id })).containSubset(user);
 		});
 
 		it('Should not find an invalid user', async () => {
-			expect(await userService.findOne({ id: 'invalid_id' })).toBeNull;
+			expect(await userService.findOne({ id: 'invalid_id' })).to.be.null;
 		});
 	});
 
@@ -89,7 +95,7 @@ describe('UserService', () => {
 			const user = await createUser(userService);
 			delete user.password;
 			const newUserData = UserFactory.buildOne();
-			expect(await userService.update({ id: user.id }, newUserData)).toMatchObject(newUserData);
+			expect(await userService.update({ id: user.id }, newUserData)).containSubset(newUserData);
 		});
 
 		it('Should not update an invalid user', async () => {
@@ -97,7 +103,7 @@ describe('UserService', () => {
 			try {
 				await userService.update({ id: 'invalid_user' }, newUserData);
 			} catch (e) {
-				expect(e).toBeInstanceOf(Error);
+				expect(e).to.be.instanceOf(Error);
 			}
 		});
 	});
@@ -105,15 +111,15 @@ describe('UserService', () => {
 	describe('remove', () => {
 		it('Should delete the created user', async () => {
 			const user = await createUser(userService);
-			expect(await userService.remove(user.id)).toMatchObject(user);
-			expect(await userService.findOne({ id: user.id })).toBeNull;
+			expect(await userService.remove(user.id)).containSubset(user);
+			expect(await userService.findOne({ id: user.id })).to.be.null;
 		});
 
 		it('Should not delete an invalid user', async () => {
 			try {
 				await userService.remove('invalid_user');
 			} catch (e) {
-				expect(e).toBeInstanceOf(Error);
+				expect(e).to.be.instanceOf(Error);
 			}
 		});
 	});

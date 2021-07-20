@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "ES2016",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -15,6 +15,10 @@
 		"typeRoots": [
 			"types",
 			"./node_modules/@types"
-		]
-  }
+		],
+		"esModuleInterop": true
+  },
+	"include": [
+		"test/**/*spec.ts"
+	]
 }

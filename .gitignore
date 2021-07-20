@@ -38,3 +38,6 @@ lerna-debug.log*
 
 # Node
 package-lock.json
+
+# Mochawesome
+outputs/
