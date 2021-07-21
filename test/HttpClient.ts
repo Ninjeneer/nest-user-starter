@@ -85,6 +85,10 @@ export default class HttpClient {
 		return this.send('PUT', url, data);
 	}
 
+	public async patch<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
+		return this.send('PATCH', url, data);
+	}
+
 	public async delete<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
 		return this.send('DELETE', url, data);
 	}

@@ -3,12 +3,14 @@ import chai, { expect } from 'chai';
 import HttpClient from './HttpClient';
 import { HttpStatus } from '@nestjs/common';
 import { User } from '@prisma/client';
+import UserFactory from '../src/user/user.factory';
 import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
 
 chai.use(chaiSubset);
 
 const httpClient = new HttpClient(Utils.buildServerURL());
+const createdUsers: User[] = [];
 
 describe('UserController (e2e)', function () {
 	this.timeout(500000);
@@ -18,20 +20,26 @@ describe('UserController (e2e)', function () {
 			httpClient.user = (await httpClient.logAsBasic()).body;
 		});
 
-		it('Should not be able to retrieve user list without being logged(/users)', async () => {
+		it('Should not be able to retrieve user list without being logged (GET /users)', async () => {
 			const response = await httpClient.withoutToken().get('/users');
 			expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
 		});
 
-		it('Should not be able to retrieve user list (/users)', async () => {
+		it('Should not be able to retrieve user list (GET /users)', async () => {
 			const response = await httpClient.get('/users');
 			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 
-		it('Should be able to retrieve himself (/users/:id)', async () => {
+		it('Should be able to find himself (GET /users/:id)', async () => {
 			const response = await httpClient.get<User>(`/users/${httpClient.user.id}`);
 			expect(response.status).to.be.eq(HttpStatus.OK);
 			expect(response.body).to.be.deep.eq(httpClient.getUser());
+		});
+
+		it('Should not be able to create a user (POST /users)', async () => {
+			const user = UserFactory.buildOne();
+			const response = await httpClient.post<User>('/users', { user });
+			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 	});
 
@@ -46,5 +54,51 @@ describe('UserController (e2e)', function () {
 			expect(response.body).to.be.instanceOf(Array);
 			expect(response.body.length).to.be.gt(0);
 		});
+
+		it('Should be able to create a user (POST /users)', async () => {
+			const user = UserFactory.buildOne();
+			const response = await httpClient.post<User>('/users', { ...user });
+			expect(response.status).to.be.eq(HttpStatus.CREATED);
+			expect(response.body.email).to.be.eq(user.email);
+			createdUsers.push(response.body);
+		});
+
+		it('Should be able to update a user (PATCH /users/:id)', async () => {
+			// Create a user
+			const user = UserFactory.buildOne();
+			let response = await httpClient.post<User>('/users', { ...user });
+			expect(response.status).to.be.eq(HttpStatus.CREATED);
+			createdUsers.push(response.body);
+
+			// Update it
+			const newUserData = UserFactory.buildOne();
+			response = await httpClient.patch<User>(`/users/${createdUsers[createdUsers.length - 1].id}`, { ...newUserData });
+			expect(response.status).to.be.eq(HttpStatus.OK);
+			expect(response.body.email).to.be.eq(newUserData.email);
+		});
+
+		it('Should be able to delete a user (DELETE /users/:id)', async () => {
+			// Create a user
+			const user = UserFactory.buildOne();
+			let response = await httpClient.post<User>('/users', { ...user });
+			expect(response.status).to.be.eq(HttpStatus.CREATED);
+			createdUsers.push(response.body);
+
+			// Delete it
+			response = await httpClient.delete<User>(`/users/${createdUsers[createdUsers.length - 1].id}`);
+			expect(response.status).to.be.eq(HttpStatus.OK);
+
+			response = await httpClient.get<User>(`/users/${createdUsers[createdUsers.length - 1].id}`);
+			expect(response.status).to.be.eq(HttpStatus.NOT_FOUND);
+			createdUsers.pop();
+		});
+	});
+
+	after(async () => {
+		await httpClient.logAsAdmin();
+		for (const user of createdUsers) {
+			const response = await httpClient.delete(`/users/${user.id}`);
+			expect(response.status).to.be.eq(HttpStatus.OK);
+		}
 	});
 });

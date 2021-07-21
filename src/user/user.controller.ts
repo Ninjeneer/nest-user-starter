@@ -14,6 +14,7 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
+	@Roles(UserRole.ADMIN)
 	async create(@Req() request: Request, @Body() createUserDto: Prisma.UserCreateInput) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
@@ -28,7 +29,11 @@ export class UserController {
 
 	@Get(':id')
 	async findOne(@Param('id') id: string) {
-		return this.hidePassword(await this.userService.findOne({ id }));
+		const user = await this.userService.findOne({ id });
+		if (!user) {
+			throw new NotFoundException();
+		}
+		return this.hidePassword(user);
 	}
 
 	@Patch(':id')
