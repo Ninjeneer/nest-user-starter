@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 
 import HttpClient from './HttpClient';
 import { HttpStatus } from '@nestjs/common';
+import { User } from '@prisma/client';
 import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
 
@@ -12,20 +13,38 @@ const httpClient = new HttpClient(Utils.buildServerURL());
 describe('UserController (e2e)', function () {
 	this.timeout(500000);
 
-	before(async () => {
-		const response = await httpClient.post<any>('/auth/login', { email: 'test@test.com', password: 'Azerty123!' });
-		if (response.status === HttpStatus.OK) {
-			httpClient.setToken(response.body.token);
-		}
+	describe('As basic user', () => {
+		before(async () => {
+			httpClient.user = (await httpClient.logAsBasic()).body;
+		});
+
+		it('Should not be able to retrieve user list without being logged(/users)', async () => {
+			const response = await httpClient.withoutToken().get('/users');
+			expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
+		});
+
+		it('Should not be able to retrieve user list (/users)', async () => {
+			const response = await httpClient.get('/users');
+			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
+		});
+
+		it('Should be able to retrieve himself (/users/:id)', async () => {
+			const response = await httpClient.get<User>(`/users/${httpClient.user.id}`);
+			expect(response.status).to.be.eq(HttpStatus.OK);
+			expect(response.body).to.be.deep.eq(httpClient.getUser());
+		});
 	});
 
-	it('Should not be able to retrieve user list (/users)', async () => {
-		const response = await httpClient.withoutToken().get('/users');
-		expect(response.status).to.be.eq(HttpStatus.UNAUTHORIZED);
-	});
+	describe('As admin user', () => {
+		before(async () => {
+			await httpClient.logAsAdmin();
+		});
 
-	it('Should not be able to retrieve user list as basic user (/users)', async () => {
-		const response = await httpClient.get('/users');
-		expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
+		it('Should be able to retrieve user list (/users)', async () => {
+			const response = await httpClient.get<User[]>('/users');
+			expect(response.status).to.be.eq(HttpStatus.OK);
+			expect(response.body).to.be.instanceOf(Array);
+			expect(response.body.length).to.be.gt(0);
+		});
 	});
 });

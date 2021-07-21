@@ -1,5 +1,9 @@
 import axios, { Method } from 'axios';
 
+import { HttpStatus } from '@nestjs/common';
+import { User } from '@prisma/client';
+import config from '../src/assets/config.json';
+
 interface HttpClientResponse<T> {
 	execution: number;
 	status: number;
@@ -10,6 +14,7 @@ interface HttpClientResponse<T> {
 export default class HttpClient {
 	private baseUrl: string;
 	private token: string;
+	public user: User;
 
 	constructor(baseUrl: string) {
 		this.baseUrl = baseUrl;
@@ -27,6 +32,13 @@ export default class HttpClient {
 
 	public setToken(token: string): void {
 		this.token = token;
+	}
+
+	public getUser(): User {
+		const user = JSON.parse(JSON.stringify(this.user));
+		delete user.password;
+		delete user.token;
+		return user;
 	}
 
 	public withoutToken(): HttpClient {
@@ -75,5 +87,21 @@ export default class HttpClient {
 
 	public async delete<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
 		return this.send('DELETE', url, data);
+	}
+
+	public async logAs(username?: string, password?: string): Promise<HttpClientResponse<any>> {
+		const response = await this.post<any>('/auth/login', { email: username, password: password });
+		if (response.status === HttpStatus.OK) {
+			this.setToken(response.body.token);
+		}
+		return response;
+	}
+
+	public async logAsAdmin(): Promise<HttpClientResponse<any>> {
+		return await this.logAs(config.tests.admin.email, config.tests.admin.password);
+	}
+
+	public async logAsBasic(): Promise<HttpClientResponse<any>> {
+		return await this.logAs(config.tests.basic.email, config.tests.basic.password);
 	}
 }

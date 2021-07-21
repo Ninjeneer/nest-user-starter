@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { Request } from 'express';
 import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { TokenGuard } from '../guards/token.guard';
 import { UserRole, UserService } from './user.service';
+import { use } from 'chai';
 
 @Controller('users')
 @UseGuards(TokenGuard, RoleGuard)
@@ -21,13 +22,13 @@ export class UserController {
 
 	@Get()
 	@Roles(UserRole.ADMIN)
-	findAll(@Req() request) {
-		return this.userService.findAll();
+	async findAll() {
+		return this.hidePasswords(await this.userService.findAll());
 	}
 
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.userService.findOne({ id });
+	async findOne(@Param('id') id: string) {
+		return this.hidePassword(await this.userService.findOne({ id }));
 	}
 
 	@Patch(':id')
@@ -49,5 +50,20 @@ export class UserController {
 	@Delete(':id')
 	remove(@Param('id') id: string) {
 		return this.userService.remove(id);
+	}
+
+	/**
+	 * Remove users password from requests
+	 * Temporary fix until Prisma implement 'exclude' operator
+	 * @param users user list
+	 * @returns user without password list
+	 */
+	private hidePasswords(users: User[]): User[] {
+		return users.map((u) => this.hidePassword(u));
+	}
+
+	private hidePassword(user: User): User {
+		delete user.password;
+		return user;
 	}
 }
