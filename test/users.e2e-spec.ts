@@ -63,6 +63,16 @@ describe('UserController (e2e)', function () {
 			createdUsers.push(response.body);
 		});
 
+		it('Should not be able to create a user with existing email (POST /users)', async () => {
+			const user = UserFactory.buildOne();
+			let response = await httpClient.post<User>('/users', { ...user });
+			expect(response.status).to.be.eq(HttpStatus.CREATED);
+			createdUsers.push(response.body);
+
+			response = await httpClient.post<User>('/users', { ...createdUsers[createdUsers.length - 1] });
+			expect(response.status).to.be.eq(HttpStatus.CONFLICT);
+		});
+
 		it('Should be able to update a user (PATCH /users/:id)', async () => {
 			// Create a user
 			const user = UserFactory.buildOne();

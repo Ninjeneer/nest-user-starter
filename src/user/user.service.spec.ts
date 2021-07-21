@@ -63,9 +63,23 @@ describe('UserService', () => {
 			await createUser(userService);
 		});
 
-		it('Should not create a user', async () => {
+		it('Should not create a user without email', async () => {
 			const user = UserFactory.buildOne();
 			delete user.email;
+
+			try {
+				await userService.create({
+					email: user.email,
+					password: user.password
+				});
+				assert(false);
+			} catch (e) {
+				expect(e).to.be.instanceOf(Error);
+			}
+		});
+
+		it('Should not create a user with an existing email', async () => {
+			const user = await createUser(userService);
 
 			try {
 				await userService.create({

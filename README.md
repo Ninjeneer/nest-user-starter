@@ -28,6 +28,9 @@ $ npm run start:prod
 ## Test
 
 ```bash
+# generate context once
+$ npm run test:context
+
 # unit tests
 $ npm run mocha
 
