@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import UserFactory from '../src/user/user.factory';
 import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
+import config from '../src/assets/config.json';
 
 chai.use(chaiSubset);
 
@@ -34,6 +35,30 @@ describe('UserController (e2e)', function () {
 			const response = await httpClient.get<User>(`/users/${httpClient.user.id}`);
 			expect(response.status).to.be.eq(HttpStatus.OK);
 			expect(response.body).to.be.deep.eq(httpClient.getUser());
+		});
+
+		it('Should be able to update himself (UPDATE /users/:id)', async () => {
+			const newUserData = UserFactory.buildOne();
+			delete newUserData.password;
+			let response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, { ...newUserData });
+			expect(response.status).to.be.eq(HttpStatus.OK);
+			expect(response.body.email).to.be.eq(newUserData.email);
+
+			// Set back email
+			response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, { email: config.tests.basic.email });
+			expect(response.status).to.be.eq(HttpStatus.OK);
+		});
+
+		it('Should not be able to update another user (UPDATE /users/:id)', async () => {
+			const newUserData = UserFactory.buildOne();
+			const response = await httpClient.patch<User>(`/users/another_id`, { ...newUserData });
+			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
+		});
+
+		it('Should not be able to delete another user (DELETE /users/:id)', async () => {
+			const newUserData = UserFactory.buildOne();
+			const response = await httpClient.delete<User>(`/users/another_id`, { ...newUserData });
+			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 
 		it('Should not be able to create a user (POST /users)', async () => {

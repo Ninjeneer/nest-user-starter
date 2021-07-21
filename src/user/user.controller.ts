@@ -6,7 +6,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { TokenGuard } from '../guards/token.guard';
 import { UserRole, UserService } from './user.service';
-import { use } from 'chai';
+import { SelfGuard } from '../guards/self.guard';
 
 @Controller('users')
 @UseGuards(TokenGuard, RoleGuard)
@@ -28,7 +28,7 @@ export class UserController {
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string) {
+	async findOne(@Req() request, @Param('id') id: string) {
 		const user = await this.userService.findOne({ id });
 		if (!user) {
 			throw new NotFoundException();
@@ -37,6 +37,7 @@ export class UserController {
 	}
 
 	@Patch(':id')
+	@UseGuards(SelfGuard)
 	async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
 		const user = await this.userService.findOne({ id });
 		if (!user) {
@@ -53,8 +54,9 @@ export class UserController {
 	}
 
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.userService.remove(id);
+	@UseGuards(SelfGuard)
+	async remove(@Param('id') id: string) {
+		return await this.userService.remove(id);
 	}
 
 	/**
@@ -64,7 +66,7 @@ export class UserController {
 	 * @returns user without password list
 	 */
 	private hidePasswords(users: User[]): User[] {
-		return users.map((u) => this.hidePassword(u));
+		return users.map((u) => u);
 	}
 
 	private hidePassword(user: User): User {

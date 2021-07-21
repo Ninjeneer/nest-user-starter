@@ -35,10 +35,10 @@ export default class HttpClient {
 	}
 
 	public getUser(): User {
-		const user = JSON.parse(JSON.stringify(this.user));
-		delete user.password;
-		delete user.token;
-		return user;
+		const userCopy = JSON.parse(JSON.stringify(this.user));
+		delete userCopy.password;
+		delete userCopy.token;
+		return userCopy;
 	}
 
 	public withoutToken(): HttpClient {
