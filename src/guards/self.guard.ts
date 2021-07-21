@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { UserRole } from '../user/user.service';
 
+/**
+ * This guard avoid users from calling ID based routes on IDs that differs from their
+ * Administrators are not concerned
+ */
 @Injectable()
 export class SelfGuard implements CanActivate {
 	canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {

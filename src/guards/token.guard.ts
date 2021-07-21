@@ -3,6 +3,10 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
 
+/**
+ * this guards avoid users without token from calling routes
+ * Also bind the user in the request object
+ */
 @Injectable()
 export class TokenGuard implements CanActivate {
 	constructor(private userService: UserService) {}
