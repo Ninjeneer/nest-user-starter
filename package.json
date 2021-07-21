@@ -21,7 +21,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-		"test:context": "ts-node test/context.ts --exit"
+    "test:context": "ts-node test/context.ts --exit"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
@@ -30,9 +30,11 @@
     "@nestjs/passport": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/platform-fastify": "^8.0.4",
+    "@nestjs/swagger": "^5.0.4",
     "@prisma/client": "^2.27.0",
     "bcrypt": "^5.0.1",
     "faker": "^5.5.3",
+    "fastify-swagger": "^4.8.3",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
