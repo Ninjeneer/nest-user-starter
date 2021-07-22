@@ -4,8 +4,10 @@ import { Request, Response } from 'express';
 import { TokenGuard } from '../guards/token.guard';
 import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Authentication')
 export class AuthController {
 	constructor(private userService: UserService, private tokenService: TokenService) {}
 

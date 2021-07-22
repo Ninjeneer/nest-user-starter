@@ -7,8 +7,10 @@ import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { TokenGuard } from '../guards/token.guard';
 import { UserRole, UserService } from './user.service';
 import { SelfGuard } from '../guards/self.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiTags('Users')
 @UseGuards(TokenGuard, RoleGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
