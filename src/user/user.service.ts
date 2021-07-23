@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { EmailAlreadyUsedException, UserDoesNotExistException } from '../exceptions/exceptions';
 import { Prisma, User } from '@prisma/client';
 
-import { EmailAlreadyUsedException } from '../exceptions/exceptions';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
 
@@ -47,7 +47,7 @@ export class UserService {
 		const user = await this.prisma.user.findFirst({ where });
 		// Check user existence
 		if (!user) {
-			throw new NotFoundException();
+			throw new UserDoesNotExistException();
 		}
 		// Avoid taking someone else email
 		if (data.email && user.email !== data.email) {
@@ -65,6 +65,10 @@ export class UserService {
 	}
 
 	async remove(id: string): Promise<User> {
+		const user = await this.findOne({ id });
+		if (!user) {
+			throw new UserDoesNotExistException();
+		}
 		return await this.prisma.user.delete({ where: { id } });
 	}
 }

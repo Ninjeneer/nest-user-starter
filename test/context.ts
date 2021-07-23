@@ -14,6 +14,7 @@ prisma.user
 			role: UserRole.ADMIN
 		}
 	})
+	.then((user) => console.log(`${user.email} created successfully`))
 	.catch((e) => console.log(e));
 
 prisma.user
@@ -24,4 +25,5 @@ prisma.user
 			role: UserRole.BASIC
 		}
 	})
+	.then((user) => console.log(`${user.email} created successfully`))
 	.catch((e) => console.log(e));

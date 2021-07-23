@@ -1,5 +1,6 @@
 import 'mocha';
 
+import { EmailAlreadyUsedException, UserDoesNotExistException } from '../exceptions/exceptions';
 import { Test, TestingModule } from '@nestjs/testing';
 import chai, { expect } from 'chai';
 
@@ -8,10 +9,11 @@ import { SecurityModule } from '../security/security.module';
 import { User } from '@prisma/client';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';
-import { assert } from 'console';
+import chaiAsPromised from 'chai-as-promised';
 import chaiSubset from 'chai-subset';
 
 chai.use(chaiSubset);
+chai.use(chaiAsPromised);
 
 const createdUsers: User[] = [];
 
@@ -67,29 +69,22 @@ describe('UserService', () => {
 			const user = UserFactory.buildOne();
 			delete user.email;
 
-			try {
-				await userService.create({
+			await expect(
+				userService.create({
 					email: user.email,
 					password: user.password
-				});
-				assert(false);
-			} catch (e) {
-				expect(e).to.be.instanceOf(Error);
-			}
+				})
+			).to.be.rejectedWith(Error);
 		});
 
 		it('Should not create a user with an existing email', async () => {
 			const user = await createUser(userService);
-
-			try {
-				await userService.create({
+			await expect(
+				userService.create({
 					email: user.email,
 					password: user.password
-				});
-				assert(false);
-			} catch (e) {
-				expect(e).to.be.instanceOf(Error);
-			}
+				})
+			).to.be.rejectedWith(EmailAlreadyUsedException);
 		});
 	});
 
@@ -115,11 +110,9 @@ describe('UserService', () => {
 
 		it('Should not update an invalid user', async () => {
 			const newUserData = UserFactory.buildOne();
-			try {
-				await userService.update({ id: 'invalid_user' }, newUserData);
-			} catch (e) {
-				expect(e).to.be.instanceOf(Error);
-			}
+			await expect(userService.update({ id: 'invalid_user' }, newUserData)).to.be.rejectedWith(
+				UserDoesNotExistException
+			);
 		});
 	});
 
@@ -131,11 +124,7 @@ describe('UserService', () => {
 		});
 
 		it('Should not delete an invalid user', async () => {
-			try {
-				await userService.remove('invalid_user');
-			} catch (e) {
-				expect(e).to.be.instanceOf(Error);
-			}
+			await expect(userService.remove('invalid_user')).to.be.rejectedWith(UserDoesNotExistException);
 		});
 	});
 });

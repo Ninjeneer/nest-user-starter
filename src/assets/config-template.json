@@ -13,5 +13,10 @@
 			"email": "basic@test.com",
 			"password": "Azerty123!"
 		}
+	},
+	"security": {
+		"password": {
+			"length": 6
+		}
 	}
 }

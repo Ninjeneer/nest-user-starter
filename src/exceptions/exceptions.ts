@@ -5,3 +5,9 @@ export class EmailAlreadyUsedException extends HttpException {
 		super('Email already used', HttpStatus.CONFLICT);
 	}
 }
+
+export class UserDoesNotExistException extends HttpException {
+	constructor() {
+		super('User does not exist', HttpStatus.NOT_FOUND);
+	}
+}
