@@ -4,21 +4,23 @@ import { Request } from 'express';
 import { TokenGuard } from '../guards/token.guard';
 import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
-import { ApiBody, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import LoginDTO from './dto/login.dto';
 import LoggedUserEntity from './entities/user-logged.entity';
 import RegisterDTO from './dto/register.dto';
 import UserEntity from '../user/entities/UserEntity';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 @ApiTags('Authentication')
 export class AuthController {
-	constructor(private userService: UserService, private tokenService: TokenService) {}
+	constructor(private userService: UserService, private tokenService: TokenService, private authService: AuthService) {}
 
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
 	@HttpCode(200)
 	@ApiBody({ type: LoginDTO })
+	@ApiOperation({ summary: 'Log in' })
 	@ApiOkResponse({ description: 'Successfully logged in', type: LoggedUserEntity })
 	@ApiUnauthorizedResponse({ description: 'Failed to log in' })
 	async login(@Req() request: Request) {
@@ -26,14 +28,18 @@ export class AuthController {
 	}
 
 	@Post('register')
+	@ApiOperation({ summary: 'Register' })
 	@ApiBody({ type: RegisterDTO })
-	@ApiOkResponse({ description: 'Successfully registered', type: UserEntity })
+	@ApiOkResponse({ description: 'Successfully registered', type: LoggedUserEntity })
 	async register(@Req() request: Request) {
-		return this.userService.create(request.body);
+		const password = request.body.password; // Protect from mutating password during user creation
+		await this.userService.create(request.body);
+		return await this.authService.validateUser(request.body.email, password);
 	}
 
 	@Post('logout')
 	@UseGuards(TokenGuard)
+	@ApiOperation({ summary: 'Log out' })
 	@ApiOkResponse({ description: 'Successfully logged out' })
 	async logout(@Req() request: Request) {
 		this.tokenService.revoke({ value: request.token });

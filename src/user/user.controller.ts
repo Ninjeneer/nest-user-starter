@@ -24,6 +24,7 @@ import {
 	ApiCreatedResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
+	ApiOperation,
 	ApiTags
 } from '@nestjs/swagger';
 import CreateUserDTO from './dto/create-user.dto';
@@ -40,6 +41,7 @@ export class UserController {
 	@Post()
 	@Roles(UserRole.ADMIN)
 	@ApiBody({ type: CreateUserDTO })
+	@ApiOperation({ summary: 'Create a user' })
 	@ApiCreatedResponse({ description: 'User created successfully', type: UserEntity })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
 	async create(@Req() request: Request, @Body() createUserDto: CreateUserDTO) {
@@ -50,12 +52,14 @@ export class UserController {
 
 	@Get()
 	@Roles(UserRole.ADMIN)
+	@ApiOperation({ summary: 'Retrieve all users' })
 	@ApiOkResponse({ description: 'Successfully retrieved user list', type: [UserEntity] })
 	async findAll() {
 		return (await this.userService.findAll()).map((user) => new UserEntity({ ...user }));
 	}
 
 	@Get(':id')
+	@ApiOperation({ summary: 'Retrieve a user' })
 	@ApiOkResponse({ description: 'Successfully retrieved user', type: UserEntity })
 	@ApiNotFoundResponse({ description: 'User does not exists' })
 	async findOne(@Param('id') id: string) {
@@ -69,6 +73,7 @@ export class UserController {
 	@Patch(':id')
 	@UseGuards(SelfGuard)
 	@ApiBody({ type: UpdateUserDTO })
+	@ApiOperation({ summary: 'Update a user' })
 	@ApiOkResponse({ description: 'Successfully updated user', type: UserEntity })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
 	async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
@@ -78,6 +83,7 @@ export class UserController {
 
 	@Delete(':id')
 	@UseGuards(SelfGuard)
+	@ApiOperation({ summary: 'Delete a user' })
 	@ApiOkResponse({ description: 'Successfully deleted user', type: UserEntity })
 	@ApiNotFoundResponse({ description: 'User does not exists' })
 	async remove(@Param('id') id: string) {
