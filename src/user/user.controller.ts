@@ -12,7 +12,6 @@ import {
 	UseGuards,
 	UseInterceptors
 } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { Request } from 'express';
 import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../decorators/roles.decorator';
@@ -44,7 +43,7 @@ export class UserController {
 	}
 
 	@Get(':id')
-	async findOne(@Req() request, @Param('id') id: string) {
+	async findOne(@Param('id') id: string) {
 		const user = await this.userService.findOne({ id });
 		if (!user) {
 			throw new NotFoundException();
@@ -64,20 +63,5 @@ export class UserController {
 	async remove(@Param('id') id: string) {
 		const user = await this.userService.remove(id);
 		return new UserEntity({ ...user });
-	}
-
-	/**
-	 * Remove users password from requests
-	 * Temporary fix until Prisma implement 'exclude' operator
-	 * @param users user list
-	 * @returns user without password list
-	 */
-	private hidePasswords(users: User[]): User[] {
-		return users.map((u) => u);
-	}
-
-	private hidePassword(user: User): User {
-		delete user.password;
-		return user;
 	}
 }
