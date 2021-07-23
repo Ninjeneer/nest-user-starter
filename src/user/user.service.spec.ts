@@ -108,6 +108,14 @@ describe('UserService', () => {
 			expect(await userService.update({ id: user.id }, newUserData)).containSubset(newUserData);
 		});
 
+		it('Should not update a user with an existing email', async () => {
+			const user = await createUser(userService);
+			const user2 = await createUser(userService);
+			await expect(userService.update({ id: user.id }, { email: user2.email })).to.be.rejectedWith(
+				EmailAlreadyUsedException
+			);
+		});
+
 		it('Should not update an invalid user', async () => {
 			const newUserData = UserFactory.buildOne();
 			await expect(userService.update({ id: 'invalid_user' }, newUserData)).to.be.rejectedWith(

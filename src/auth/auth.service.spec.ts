@@ -45,4 +45,10 @@ describe('AuthService', () => {
 			expect(await authService.validateUser(user.email, user.password)).containSubset(createdUser);
 		});
 	});
+
+	describe('validateUser', () => {
+		it('Should not find any user', async () => {
+			expect(await authService.validateUser('invalid@email.com', 'Azerty123')).to.be.null;
+		});
+	});
 });
