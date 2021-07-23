@@ -34,6 +34,13 @@ describe('AuthController (e2e)', function () {
 		expect(response.status).to.be.eq(HttpStatus.CONFLICT);
 	});
 
+	it('Should not register a new user with a short password (POST /auth/register)', async () => {
+		const user = UserFactory.buildOne();
+		user.password = '123';
+		const response = await httpClient.post<LoggedUserEntity>('/auth/register', user);
+		expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);
+	});
+
 	it('Should not register a new user with invalid information (POST /auth/register)', async () => {
 		let response = await httpClient.post<LoggedUserEntity>('/auth/register', {});
 		expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);

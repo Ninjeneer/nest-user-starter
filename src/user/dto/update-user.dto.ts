@@ -1,6 +1,8 @@
+import { IsEmail, IsOptional, Length } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail } from 'class-validator';
 import { UserRole } from '../user.service';
+import config from '../../assets/config.json';
 
 export default class UpdateUserDTO {
 	@ApiProperty()
@@ -8,6 +10,8 @@ export default class UpdateUserDTO {
 	email: string;
 
 	@ApiProperty()
+	@IsOptional()
+	@Length(config.security.password.length)
 	password: string;
 
 	@ApiProperty()

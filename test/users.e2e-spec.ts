@@ -40,7 +40,7 @@ describe('UserController (e2e)', function () {
 		it('Should be able to update himself (UPDATE /users/:id)', async () => {
 			const newUserData = UserFactory.buildOne();
 			delete newUserData.password;
-			let response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, { ...newUserData });
+			let response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, newUserData);
 			expect(response.status).to.be.eq(HttpStatus.OK);
 			expect(response.body.email).to.be.eq(newUserData.email);
 
@@ -51,25 +51,25 @@ describe('UserController (e2e)', function () {
 
 		it('Should not be able to update himself with an invalid email (UPDATE /users/:id)', async () => {
 			const newUserData = { email: 'invalid_email' };
-			const response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, { ...newUserData });
+			const response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, newUserData);
 			expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should not be able to update another user (UPDATE /users/:id)', async () => {
 			const newUserData = UserFactory.buildOne();
-			const response = await httpClient.patch<User>(`/users/another_id`, { ...newUserData });
+			const response = await httpClient.patch<User>(`/users/another_id`, newUserData);
 			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 
 		it('Should not be able to delete another user (DELETE /users/:id)', async () => {
 			const newUserData = UserFactory.buildOne();
-			const response = await httpClient.delete<User>(`/users/another_id`, { ...newUserData });
+			const response = await httpClient.delete<User>(`/users/another_id`, newUserData);
 			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 
 		it('Should not be able to create a user (POST /users)', async () => {
 			const user = UserFactory.buildOne();
-			const response = await httpClient.post<User>('/users', { user });
+			const response = await httpClient.post<User>('/users', user);
 			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 	});
@@ -88,7 +88,7 @@ describe('UserController (e2e)', function () {
 
 		it('Should be able to create a user (POST /users)', async () => {
 			const user = UserFactory.buildOne();
-			const response = await httpClient.post<User>('/users', { ...user });
+			const response = await httpClient.post<User>('/users', user);
 			expect(response.status).to.be.eq(HttpStatus.CREATED);
 			expect(response.body.email).to.be.eq(user.email);
 			createdUsers.push(response.body);
@@ -97,18 +97,25 @@ describe('UserController (e2e)', function () {
 		it('Should not be able to create a user without email (POST /users)', async () => {
 			const user = UserFactory.buildOne();
 			delete user.email;
-			const response = await httpClient.post<User>('/users', { ...user });
+			const response = await httpClient.post<User>('/users', user);
 			expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should not be able to create a user with existing email (POST /users)', async () => {
 			const user = UserFactory.buildOne();
-			let response = await httpClient.post<User>('/users', { ...user });
+			let response = await httpClient.post<User>('/users', user);
 			expect(response.status).to.be.eq(HttpStatus.CREATED);
 			createdUsers.push({ password: user.password, ...response.body });
 
 			response = await httpClient.post<User>('/users', { ...createdUsers[createdUsers.length - 1] });
 			expect(response.status).to.be.eq(HttpStatus.CONFLICT);
+		});
+
+		it('Should not be able to create a user with short password (POST /users)', async () => {
+			const user = UserFactory.buildOne();
+			user.password = '123';
+			const response = await httpClient.post<User>('/users', user);
+			expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should be able to update a user (PATCH /users/:id)', async () => {
@@ -120,9 +127,23 @@ describe('UserController (e2e)', function () {
 
 			// Update it
 			const newUserData = UserFactory.buildOne();
-			response = await httpClient.patch<User>(`/users/${createdUsers[createdUsers.length - 1].id}`, { ...newUserData });
+			response = await httpClient.patch<User>(`/users/${createdUsers[createdUsers.length - 1].id}`, newUserData);
 			expect(response.status).to.be.eq(HttpStatus.OK);
 			expect(response.body.email).to.be.eq(newUserData.email);
+		});
+
+		it('Should not be able to update a user with a short password (PATCH /users/:id)', async () => {
+			// Create a user
+			const user = UserFactory.buildOne();
+			let response = await httpClient.post<User>('/users', { ...user });
+			expect(response.status).to.be.eq(HttpStatus.CREATED);
+			createdUsers.push(response.body);
+
+			// Update it
+			const newUserData = UserFactory.buildOne();
+			newUserData.password = '123';
+			response = await httpClient.patch<User>(`/users/${createdUsers[createdUsers.length - 1].id}`, newUserData);
+			expect(response.status).to.be.eq(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should be able to delete a user (DELETE /users/:id)', async () => {
