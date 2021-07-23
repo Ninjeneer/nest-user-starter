@@ -1,30 +1,46 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import {
+	Body,
+	ClassSerializerInterceptor,
+	Controller,
+	Delete,
+	Get,
+	NotFoundException,
+	Param,
+	Patch,
+	Post,
+	Req,
+	UseGuards,
+	UseInterceptors
+} from '@nestjs/common';
+import { User } from '@prisma/client';
 import { Request } from 'express';
 import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../decorators/roles.decorator';
-import { EmailAlreadyUsedException } from '../exceptions/exceptions';
 import { TokenGuard } from '../guards/token.guard';
 import { UserRole, UserService } from './user.service';
 import { SelfGuard } from '../guards/self.guard';
+import CreateUserDTO from './dto/CreateUserDTO';
+import UpdateUserDTO from './dto/UpdateUserDTO';
+import UserEntity from './entities/UserEntity';
 
 @Controller('users')
 @UseGuards(TokenGuard, RoleGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
 	@Roles(UserRole.ADMIN)
-	async create(@Req() request: Request, @Body() createUserDto: Prisma.UserCreateInput) {
+	async create(@Req() request: Request, @Body() createUserDto: CreateUserDTO) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
-		return user;
+		return new UserEntity({ ...user });
 	}
 
 	@Get()
 	@Roles(UserRole.ADMIN)
 	async findAll() {
-		return this.hidePasswords(await this.userService.findAll());
+		return (await this.userService.findAll()).map((user) => new UserEntity({ ...user }));
 	}
 
 	@Get(':id')
@@ -33,30 +49,21 @@ export class UserController {
 		if (!user) {
 			throw new NotFoundException();
 		}
-		return this.hidePassword(user);
+		return new UserEntity({ ...user });
 	}
 
 	@Patch(':id')
 	@UseGuards(SelfGuard)
-	async update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
-		const user = await this.userService.findOne({ id });
-		if (!user) {
-			throw new NotFoundException();
-		}
-		// Avoid taking someone else email
-		if (updateUserDto.email && user.email !== updateUserDto.email) {
-			const otherUser = await this.userService.findOne({ email: updateUserDto.email.toString() });
-			if (otherUser) {
-				throw new EmailAlreadyUsedException();
-			}
-		}
-		return this.userService.update({ id }, updateUserDto);
+	async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
+		const user = await this.userService.update({ id }, updateUserDto);
+		return new UserEntity({ ...user });
 	}
 
 	@Delete(':id')
 	@UseGuards(SelfGuard)
 	async remove(@Param('id') id: string) {
-		return await this.userService.remove(id);
+		const user = await this.userService.remove(id);
+		return new UserEntity({ ...user });
 	}
 
 	/**

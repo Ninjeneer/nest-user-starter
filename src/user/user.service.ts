@@ -1,7 +1,7 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 
 import { EmailAlreadyUsedException } from '../exceptions/exceptions';
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
 
@@ -44,6 +44,18 @@ export class UserService {
 	}
 
 	async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {
+		const user = await this.prisma.user.findFirst({ where });
+		// Check user existence
+		if (!user) {
+			throw new NotFoundException();
+		}
+		// Avoid taking someone else email
+		if (data.email && user.email !== data.email) {
+			const otherUser = await this.findOneByEmail(data.email.toString());
+			if (otherUser) {
+				throw new EmailAlreadyUsedException();
+			}
+		}
 		// If the password is changed, hash it
 		if (data.password) {
 			data.password = this.securityService.hashPassword(data.password.toString());
