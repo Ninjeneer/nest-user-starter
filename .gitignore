@@ -36,9 +36,6 @@ lerna-debug.log*
 # Prisma
 .env
 
-# Node
-package-lock.json
-
 # Mochawesome
 outputs/
 
