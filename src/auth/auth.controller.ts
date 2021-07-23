@@ -1,14 +1,14 @@
-import { Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { TokenGuard } from '../guards/token.guard';
 import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
-import { ApiBody, ApiOkResponse, ApiProperty, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import LoginDTO from './dto/login.dto';
 import LoggedUserEntity from './entities/user-logged.entity';
 import RegisterDTO from './dto/register.dto';
-import UserEntity from 'src/user/entities/UserEntity';
+import UserEntity from '../user/entities/UserEntity';
 
 @Controller('auth')
 @ApiTags('Authentication')
