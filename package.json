@@ -17,10 +17,6 @@
     "mocha": "mocha -r ts-node/register --reporter mochawesome --reporter-options json=false --exit",
     "mocha:e2e": "mocha -r ts-node/register test/**/*spec.ts --reporter mochawesome --reporter-options json=false --exit",
     "mocha:cov": "nyc --reporter=text mocha",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:context": "ts-node test/context.ts --exit"
   },
   "dependencies": {
