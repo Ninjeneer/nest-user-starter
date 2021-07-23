@@ -1,4 +1,4 @@
-import { Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { TokenGuard } from '../guards/token.guard';
@@ -31,14 +31,15 @@ export class AuthController {
 	@ApiOperation({ summary: 'Register' })
 	@ApiBody({ type: RegisterDTO })
 	@ApiOkResponse({ description: 'Successfully registered', type: LoggedUserEntity })
-	async register(@Req() request: Request) {
-		const password = request.body.password; // Protect from mutating password during user creation
-		await this.userService.create(request.body);
-		return await this.authService.validateUser(request.body.email, password);
+	async register(@Body() registerDto: RegisterDTO) {
+		const password = registerDto.password; // Protect from mutating password during user creation
+		await this.userService.create(registerDto);
+		return await this.authService.validateUser(registerDto.email, password);
 	}
 
 	@Post('logout')
 	@UseGuards(TokenGuard)
+	@HttpCode(200)
 	@ApiOperation({ summary: 'Log out' })
 	@ApiOkResponse({ description: 'Successfully logged out' })
 	async logout(@Req() request: Request) {

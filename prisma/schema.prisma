@@ -27,5 +27,5 @@ model Token {
 	createdAt	DateTime @default(now())
 	expiresAt	DateTime?
 	userID	  String
-	user	    User	@relation(fields: [userID], references: [id])
+	user	    User?	@relation(fields: [userID], references: [id])
 }

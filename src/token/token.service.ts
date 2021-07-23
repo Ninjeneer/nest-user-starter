@@ -49,7 +49,9 @@ export class TokenService {
 	 * @param where where condition
 	 * @returns number of revoked tokens
 	 */
-	async revoke(where: Prisma.TokenWhereUniqueInput): Promise<number> {
-		return (await this.prisma.token.deleteMany({ where })).count;
+	async revoke(where: Prisma.TokenWhereInput): Promise<number> {
+		return await (
+			await this.prisma.token.deleteMany({ where })
+		).count;
 	}
 }

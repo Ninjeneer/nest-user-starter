@@ -25,6 +25,7 @@ export class TokenGuard implements CanActivate {
 				throw new UnauthorizedException();
 			} else {
 				Object.assign(request, { user });
+				Object.assign(request, { token });
 				return true;
 			}
 		} else {
