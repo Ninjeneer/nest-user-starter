@@ -26,8 +26,8 @@ import {
 	ApiOkResponse,
 	ApiTags
 } from '@nestjs/swagger';
-import CreateUserDTO from './dto/CreateUserDTO';
-import UpdateUserDTO from './dto/UpdateUserDTO';
+import CreateUserDTO from './dto/create-user.dto';
+import UpdateUserDTO from './dto/update-user.dto';
 import UserEntity from './entities/UserEntity';
 
 @Controller('users')
