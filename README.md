@@ -12,7 +12,7 @@
 $ npm install
 ```
 
-## Migrate database
+## Migrate database
 
 ```bash
 npx prisma migrate dev
