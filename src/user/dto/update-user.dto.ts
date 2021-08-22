@@ -7,13 +7,13 @@ import config from '../../assets/config.json';
 export default class UpdateUserDTO {
 	@ApiProperty()
 	@IsEmail()
-	email: string;
+	email?: string;
 
 	@ApiProperty()
 	@IsOptional()
 	@Length(config.security.password.length)
-	password: string;
+	password?: string;
 
 	@ApiProperty()
-	role: UserRole;
+	role?: UserRole;
 }

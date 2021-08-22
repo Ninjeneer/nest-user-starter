@@ -64,6 +64,7 @@ export default class HttpClient {
 			};
 		} catch (e) {
 			const t2 = Date.now();
+			console.log(JSON.stringify(e));
 			return {
 				execution: t2 - t1,
 				status: e.response.status,

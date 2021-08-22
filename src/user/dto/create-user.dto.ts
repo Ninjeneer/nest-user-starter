@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, Length } from 'class-validator';
+import { IsEmail, IsIP, IsOptional, Length } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../user.service';
@@ -15,5 +15,9 @@ export default class CreateUserDTO {
 	password: string;
 
 	@ApiProperty({ enum: UserRole })
-	role: UserRole;
+	role?: UserRole;
+
+	@IsIP()
+	@IsOptional()
+	ip?: string;
 }

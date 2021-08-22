@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import UserEntity from '../../user/entities/UserEntity';
+import User from '../../user/entities/user.entity';
 
-export default class LoggedUserEntity extends UserEntity {
+export default class LoggedUserEntity extends User {
 	@ApiProperty()
 	token: string;
 }

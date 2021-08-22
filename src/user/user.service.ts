@@ -1,9 +1,11 @@
 import { EmailAlreadyUsedException, UserDoesNotExistException } from '../exceptions/exceptions';
 import { Prisma, User } from '@prisma/client';
 
+import CreateUserDTO from './dto/create-user.dto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
+import UpdateUserDTO from './dto/update-user.dto';
 
 export enum UserRole {
 	BASIC = 'basic',
@@ -14,7 +16,7 @@ export enum UserRole {
 export class UserService {
 	constructor(private prisma: PrismaService, private securityService: SecurityService) {}
 
-	async create(createUserDto: Prisma.UserCreateInput): Promise<User> {
+	async create(createUserDto: CreateUserDTO): Promise<User> {
 		// Check for existing user
 		let user = await this.prisma.user.findUnique({ where: { email: createUserDto.email } });
 		if (user) {
@@ -31,8 +33,8 @@ export class UserService {
 		return await this.prisma.user.findMany();
 	}
 
-	async findOne(where: Prisma.UserWhereUniqueInput): Promise<User> {
-		return await this.prisma.user.findUnique({ where });
+	async findOne(id: string): Promise<User> {
+		return await this.prisma.user.findUnique({ where: { id } });
 	}
 
 	async findOneByEmail(email: string): Promise<User> {
@@ -43,8 +45,8 @@ export class UserService {
 		return await this.prisma.user.findFirst({ where: { tokens: { some: { value: token } } } });
 	}
 
-	async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {
-		const user = await this.prisma.user.findFirst({ where });
+	async update(id: string, data: UpdateUserDTO): Promise<User> {
+		const user = await this.prisma.user.findFirst({ where: { id } });
 		// Check user existence
 		if (!user) {
 			throw new UserDoesNotExistException();
@@ -61,11 +63,21 @@ export class UserService {
 			data.password = this.securityService.hashPassword(data.password.toString());
 		}
 		// Update the user
-		return await this.prisma.user.update({ where, data });
+		return await this.prisma.user.update({ where: { id }, data });
+	}
+
+	async addToken(id: string, token: Prisma.TokenCreateWithoutUserInput) {
+		let user = await this.prisma.user.findFirst({ where: { id } });
+		// Check user existence
+		if (!user) {
+			throw new UserDoesNotExistException();
+		}
+		user = await this.prisma.user.update({ where: { id }, data: { tokens: { create: [token] } } });
+		return user;
 	}
 
 	async remove(id: string): Promise<User> {
-		const user = await this.findOne({ id });
+		const user = await this.findOne(id);
 		if (!user) {
 			throw new UserDoesNotExistException();
 		}

@@ -16,7 +16,7 @@ export class AuthService {
 		let user = await this.userService.findOneByEmail(email);
 		if (user && this.securityService.comparePasswords(password, user.password)) {
 			// Generate a token for the user
-			user = await this.userService.update({ id: user.id }, { tokens: { create: [this.tokenService.create()] } });
+			user = await this.userService.addToken(user.id, this.tokenService.create());
 			// Delete the password from the response
 			delete user.password;
 			// Add the latest token to the response

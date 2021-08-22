@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { UserRole } from '../user.service';
 
-export default class UserEntity {
+export default class User {
 	@ApiProperty()
 	id: string;
 
@@ -24,7 +24,7 @@ export default class UserEntity {
 	@Exclude()
 	password: string;
 
-	constructor(partial: Partial<UserEntity>) {
+	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
 	}
 }

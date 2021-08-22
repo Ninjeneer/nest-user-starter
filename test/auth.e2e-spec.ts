@@ -3,7 +3,7 @@ import chai, { expect } from 'chai';
 import HttpClient from './HttpClient';
 import { HttpStatus } from '@nestjs/common';
 import LoggedUserEntity from '../src/auth/entities/user-logged.entity';
-import UserEntity from '../src/user/entities/UserEntity';
+import User from '../src/user/entities/user.entity';
 import UserFactory from '../src/user/user.factory';
 import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
@@ -12,7 +12,7 @@ import config from '../src/assets/config.json';
 chai.use(chaiSubset);
 
 const httpClient = new HttpClient(Utils.buildServerURL());
-const createdUsers: UserEntity[] = [];
+const createdUsers: User[] = [];
 
 describe('AuthController (e2e)', function () {
 	this.timeout(500000);

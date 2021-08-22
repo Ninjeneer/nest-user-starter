@@ -23,6 +23,7 @@ async function createUser(userService: UserService) {
 		email: user.email,
 		password: user.password
 	});
+	expect(createdUser.password).to.not.be.eq(user.password);
 	delete user.password;
 	expect(createdUser).containSubset(user);
 	createdUsers.push(createdUser);
@@ -92,33 +93,36 @@ describe('UserService', () => {
 		it('Should find the created user', async () => {
 			const user = await createUser(userService);
 			delete user.password;
-			expect(await userService.findOne({ id: user.id })).containSubset(user);
+			expect(await userService.findOne(user.id)).containSubset(user);
 		});
 
 		it('Should not find an invalid user', async () => {
-			expect(await userService.findOne({ id: 'invalid_id' })).to.be.null;
+			expect(await userService.findOne('invalid_id')).to.be.null;
 		});
 	});
 
 	describe('update', () => {
 		it('Should update the created user', async () => {
 			const user = await createUser(userService);
-			delete user.password;
 			const newUserData = UserFactory.buildOne();
-			expect(await userService.update({ id: user.id }, newUserData)).containSubset(newUserData);
+			const updatedUser = await userService.update(user.id, {
+				email: newUserData.email,
+				password: newUserData.password
+			});
+			delete updatedUser.password;
+			delete newUserData.password;
+			expect(updatedUser).containSubset(newUserData);
 		});
 
 		it('Should not update a user with an existing email', async () => {
 			const user = await createUser(userService);
 			const user2 = await createUser(userService);
-			await expect(userService.update({ id: user.id }, { email: user2.email })).to.be.rejectedWith(
-				EmailAlreadyUsedException
-			);
+			await expect(userService.update(user.id, { email: user2.email })).to.be.rejectedWith(EmailAlreadyUsedException);
 		});
 
 		it('Should not update an invalid user', async () => {
 			const newUserData = UserFactory.buildOne();
-			await expect(userService.update({ id: 'invalid_user' }, newUserData)).to.be.rejectedWith(
+			await expect(userService.update('invalid_user', { email: newUserData.email })).to.be.rejectedWith(
 				UserDoesNotExistException
 			);
 		});
@@ -128,7 +132,7 @@ describe('UserService', () => {
 		it('Should delete the created user', async () => {
 			const user = await createUser(userService);
 			expect(await userService.remove(user.id)).containSubset(user);
-			expect(await userService.findOne({ id: user.id })).to.be.null;
+			expect(await userService.findOne(user.id)).to.be.null;
 		});
 
 		it('Should not delete an invalid user', async () => {

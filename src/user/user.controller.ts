@@ -29,7 +29,7 @@ import {
 } from '@nestjs/swagger';
 import CreateUserDTO from './dto/create-user.dto';
 import UpdateUserDTO from './dto/update-user.dto';
-import UserEntity from './entities/UserEntity';
+import User from './entities/user.entity';
 
 @Controller('users')
 @ApiTags('Users')
@@ -42,52 +42,52 @@ export class UserController {
 	@Roles(UserRole.ADMIN)
 	@ApiBody({ type: CreateUserDTO })
 	@ApiOperation({ summary: 'Create a user' })
-	@ApiCreatedResponse({ description: 'User created successfully', type: UserEntity })
+	@ApiCreatedResponse({ description: 'User created successfully', type: User })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
 	async create(@Req() request: Request, @Body() createUserDto: CreateUserDTO) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
-		return new UserEntity({ ...user });
+		return new User({ ...user });
 	}
 
 	@Get()
 	@Roles(UserRole.ADMIN)
 	@ApiOperation({ summary: 'Retrieve all users' })
-	@ApiOkResponse({ description: 'Successfully retrieved user list', type: [UserEntity] })
+	@ApiOkResponse({ description: 'Successfully retrieved user list', type: [User] })
 	async findAll() {
-		return (await this.userService.findAll()).map((user) => new UserEntity({ ...user }));
+		return (await this.userService.findAll()).map((user) => new User({ ...user }));
 	}
 
 	@Get(':id')
 	@ApiOperation({ summary: 'Retrieve a user' })
-	@ApiOkResponse({ description: 'Successfully retrieved user', type: UserEntity })
+	@ApiOkResponse({ description: 'Successfully retrieved user', type: User })
 	@ApiNotFoundResponse({ description: 'User does not exists' })
 	async findOne(@Param('id') id: string) {
-		const user = await this.userService.findOne({ id });
+		const user = await this.userService.findOne(id);
 		if (!user) {
 			throw new NotFoundException();
 		}
-		return new UserEntity({ ...user });
+		return new User({ ...user });
 	}
 
 	@Patch(':id')
 	@UseGuards(SelfGuard)
 	@ApiBody({ type: UpdateUserDTO })
 	@ApiOperation({ summary: 'Update a user' })
-	@ApiOkResponse({ description: 'Successfully updated user', type: UserEntity })
+	@ApiOkResponse({ description: 'Successfully updated user', type: User })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
 	async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
-		const user = await this.userService.update({ id }, updateUserDto);
-		return new UserEntity({ ...user });
+		const user = await this.userService.update(id, updateUserDto);
+		return new User({ ...user });
 	}
 
 	@Delete(':id')
 	@UseGuards(SelfGuard)
 	@ApiOperation({ summary: 'Delete a user' })
-	@ApiOkResponse({ description: 'Successfully deleted user', type: UserEntity })
+	@ApiOkResponse({ description: 'Successfully deleted user', type: User })
 	@ApiNotFoundResponse({ description: 'User does not exists' })
 	async remove(@Param('id') id: string) {
 		const user = await this.userService.remove(id);
-		return new UserEntity({ ...user });
+		return new User({ ...user });
 	}
 }

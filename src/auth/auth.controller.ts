@@ -8,7 +8,6 @@ import { ApiBody, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse 
 import LoginDTO from './dto/login.dto';
 import LoggedUserEntity from './entities/user-logged.entity';
 import RegisterDTO from './dto/register.dto';
-import UserEntity from '../user/entities/UserEntity';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
