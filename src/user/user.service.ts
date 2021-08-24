@@ -23,9 +23,9 @@ export class UserService {
 			throw new EmailAlreadyUsedException();
 		}
 		// Hash password
-		createUserDto.password = this.securityService.hashPassword(createUserDto.password);
+		const encryptedPassword = this.securityService.hashPassword(createUserDto.password);
 		// Create user
-		user = await this.prisma.user.create({ data: createUserDto });
+		user = await this.prisma.user.create({ data: { ...createUserDto, password: encryptedPassword } });
 		return user;
 	}
 
@@ -47,6 +47,7 @@ export class UserService {
 
 	async update(id: string, data: UpdateUserDTO): Promise<User> {
 		const user = await this.prisma.user.findFirst({ where: { id } });
+		const updateData = { ...data };
 		// Check user existence
 		if (!user) {
 			throw new UserDoesNotExistException();
@@ -60,10 +61,10 @@ export class UserService {
 		}
 		// If the password is changed, hash it
 		if (data.password) {
-			data.password = this.securityService.hashPassword(data.password.toString());
+			updateData.password = this.securityService.hashPassword(data.password.toString());
 		}
 		// Update the user
-		return await this.prisma.user.update({ where: { id }, data });
+		return await this.prisma.user.update({ where: { id }, data: updateData });
 	}
 
 	async addToken(id: string, token: Prisma.TokenCreateWithoutUserInput) {

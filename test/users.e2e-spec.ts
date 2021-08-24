@@ -4,6 +4,7 @@ import HttpClient from './HttpClient';
 import { HttpStatus } from '@nestjs/common';
 import { User } from '@prisma/client';
 import UserFactory from '../src/user/user.factory';
+import { UserRole } from '../src/user/user.service';
 import Utils from '../src/utils';
 import chaiSubset from 'chai-subset';
 import config from '../src/assets/config.json';
@@ -47,6 +48,14 @@ describe('UserController (e2e)', function () {
 			// Set back email
 			response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, { email: config.tests.basic.email });
 			expect(response.status).to.be.eq(HttpStatus.OK);
+		});
+
+		it('Should not be able to update himself his role (UPDATE /users/:id)', async () => {
+			const newUserData = UserFactory.buildOne();
+			delete newUserData.password;
+			newUserData.role = UserRole.ADMIN;
+			const response = await httpClient.patch<User>(`/users/${httpClient.getUser().id}`, newUserData);
+			expect(response.status).to.be.eq(HttpStatus.FORBIDDEN);
 		});
 
 		it('Should not be able to update himself with an invalid email (UPDATE /users/:id)', async () => {

@@ -30,6 +30,7 @@ import {
 import CreateUserDTO from './dto/create-user.dto';
 import UpdateUserDTO from './dto/update-user.dto';
 import User from './entities/user.entity';
+import { ForbiddenBasicActions, ForbiddenBasicException } from '../exceptions/exceptions';
 
 @Controller('users')
 @ApiTags('Users')
@@ -76,7 +77,10 @@ export class UserController {
 	@ApiOperation({ summary: 'Update a user' })
 	@ApiOkResponse({ description: 'Successfully updated user', type: User })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
-	async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
+	async update(@Req() request: Request, @Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
+		if (request.user.role === UserRole.BASIC && updateUserDto.role) {
+			throw new ForbiddenBasicException([ForbiddenBasicActions.UPDATE_ROLE]);
+		}
 		const user = await this.userService.update(id, updateUserDto);
 		return new User({ ...user });
 	}
