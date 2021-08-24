@@ -17,7 +17,7 @@ $ npm install
 ## Configuration
 Copy the `src/assets/config-template.json` file as `src/assets/config.json`
 ```bash
-$ cp src/assets/config-template/json src/assets/config.json
+$ cp src/assets/config-template.json src/assets/config.json
 ```
 Feel free to edit settings to match your environment requirements
 
