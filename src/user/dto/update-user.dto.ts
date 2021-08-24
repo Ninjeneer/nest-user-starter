@@ -1,19 +1,4 @@
-import { IsEmail, IsOptional, Length } from 'class-validator';
+import CreateUserDTO from './create-user.dto';
+import { PartialType } from '@nestjs/swagger';
 
-import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '../user.service';
-import config from '../../assets/config.json';
-
-export default class UpdateUserDTO {
-	@ApiProperty()
-	@IsEmail()
-	email?: string;
-
-	@ApiProperty()
-	@IsOptional()
-	@Length(config.security.password.length)
-	password?: string;
-
-	@ApiProperty()
-	role?: UserRole;
-}
+export default class UpdateUserDTO extends PartialType(CreateUserDTO) {}

@@ -7,17 +7,17 @@ import config from '../../assets/config.json';
 export default class CreateUserDTO {
 	@ApiProperty()
 	@IsEmail()
-	email: string;
+	readonly email: string;
 
 	@ApiProperty()
 	@IsOptional()
 	@Length(config.security.password.length)
-	password: string;
+	readonly password: string;
 
 	@ApiProperty({ enum: UserRole })
-	role?: UserRole;
+	readonly role?: UserRole;
 
 	@IsIP()
 	@IsOptional()
-	ip?: string;
+	readonly ip?: string;
 }
