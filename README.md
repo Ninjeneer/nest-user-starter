@@ -1,6 +1,7 @@
-<p align="center">
+<div style="text-align: center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+	<h1>NestJS Starter-Kit</h1>
+</div>
 
 ## Description
 
@@ -11,6 +12,13 @@
 ```bash
 $ npm install
 ```
+
+## Configuration
+Copy the `src/assets/config-template.json` file as `src/assets/config.json`
+```bash
+$ cp src/assets/config-template/json src/assets/config.json
+```
+Feel free to edit settings to match your environment requirements
 
 ## Migrate database
 
