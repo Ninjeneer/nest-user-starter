@@ -1,7 +1,8 @@
-<div style="text-align: center">
+<p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-	<h1>NestJS Starter-Kit</h1>
-</div>
+</p>
+<h1 align="center">NestJS Starter-Kit</h1>
+
 
 ## Description
 
