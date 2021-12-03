@@ -49,6 +49,7 @@ describe('UserService', () => {
 				await userService.remove(user.id);
 			} catch (e) {}
 		}
+		await module.get(PrismaService).$disconnect();
 		await module.close();
 	});
 	it('should be defined', () => {

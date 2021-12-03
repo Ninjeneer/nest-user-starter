@@ -5,6 +5,7 @@ import chai, { expect } from 'chai';
 
 import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
+import { PrismaService } from '../../src/prisma.service';
 import { SecurityModule } from '../security/security.module';
 import { TokenModule } from '../token/token.module';
 import UserFactory from '../user/user.factory';
@@ -29,7 +30,10 @@ describe('AuthService', () => {
 		userService = module.get<UserService>(UserService);
 	});
 
-	afterEach(async () => await module.close());
+	afterEach(async () => {
+		await module.get(PrismaService).$disconnect();
+		await module.close();
+	});
 
 	it('should be defined', () => {
 		expect(authService).to.not.be.null;

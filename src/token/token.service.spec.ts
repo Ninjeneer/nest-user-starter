@@ -23,7 +23,10 @@ describe('TokenService', () => {
 		tokenService = module.get<TokenService>(TokenService);
 	});
 
-	afterEach(async () => await module.close());
+	afterEach(async () => {
+		await module.get(PrismaService).$disconnect();
+		await module.close();
+	});
 
 	it('should be defined', () => {
 		expect(tokenService).to.not.be.null;
