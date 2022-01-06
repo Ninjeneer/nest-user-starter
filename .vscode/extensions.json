@@ -3,6 +3,9 @@
         "prisma.prisma",
         "redhat.vscode-yaml",
         "editorconfig.editorconfig",
-        "kavod-io.vscode-jest-test-adapter"
+        "ms-vscode.vscode-typescript-next",
+        "dbaeumer.vscode-eslint",
+        "hbenl.vscode-mocha-test-adapter",
+        "cweijan.vscode-database-client2"
     ]
 }

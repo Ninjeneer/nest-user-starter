@@ -6,11 +6,11 @@ import chai, { expect } from 'chai';
 
 import { PrismaService } from '../prisma.service';
 import { SecurityModule } from '../security/security.module';
-import { User } from '@prisma/client';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';
 import chaiAsPromised from 'chai-as-promised';
 import chaiSubset from 'chai-subset';
+import User from './entities/user.entity';
 
 chai.use(chaiSubset);
 chai.use(chaiAsPromised);

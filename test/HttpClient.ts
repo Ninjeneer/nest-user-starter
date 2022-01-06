@@ -1,37 +1,39 @@
-import axios, { Method } from 'axios';
-
+import { Chain } from 'light-my-request';
 import { HttpStatus } from '@nestjs/common';
-import { User } from '@prisma/client';
-import config from '../src/assets/config.json';
-
-interface HttpClientResponse<T> {
-	execution: number;
-	status: number;
-	body: T;
-	headers: any;
-}
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import User from 'src/user/entities/user.entity';
 
 export default class HttpClient {
-	private baseUrl: string;
+	private app: NestFastifyApplication;
+	private withToken: boolean;
+
 	private token: string;
 	public user: User;
 
-	constructor(baseUrl: string) {
-		this.baseUrl = baseUrl;
+	constructor(app: NestFastifyApplication, withToken = true) {
+		this.app = app;
+		this.withToken = withToken;
 	}
 
 	private buildHeaders() {
-		return {
-			authorization: this.token ? 'Bearer ' + this.token : ''
-		};
-	}
-
-	public setBaseUrl(url: string): void {
-		this.baseUrl = url;
+		const headers = {};
+		if (this.withToken) {
+			Object.assign(headers, { authorization: this.token ? 'Bearer ' + this.token : '' });
+		}
+		return headers;
 	}
 
 	public setToken(token: string): void {
 		this.token = token;
+	}
+
+	public withoutToken(): HttpClient {
+		return new HttpClient(this.app, false);
+	}
+
+	public setUser(user: User) {
+		this.user = user;
+		this.setToken(user.token.toString());
 	}
 
 	public getUser(): User {
@@ -41,72 +43,44 @@ export default class HttpClient {
 		return userCopy;
 	}
 
-	public withoutToken(): HttpClient {
-		return new HttpClient(this.baseUrl);
+	private async send(
+		method: any,
+		url: string,
+		payload?: Record<string, any>,
+		params?: Record<string, any>
+	): Promise<Chain> {
+		return await this.app.inject({ method, url, payload, query: params, headers: this.buildHeaders() });
 	}
 
-	private async send<T>(method: Method, url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
-		const t1 = Date.now();
-		try {
-			const response = await axios.request({
-				method,
-				data,
-				params: method === 'GET' ? data : null,
-				url: this.baseUrl + url,
-				headers: this.buildHeaders()
-			});
-			const t2 = Date.now();
-			return {
-				execution: t2 - t1,
-				status: response.status,
-				body: response.data,
-				headers: response.headers
-			};
-		} catch (e) {
-			const t2 = Date.now();
-			console.log(JSON.stringify(e));
-			return {
-				execution: t2 - t1,
-				status: e.response.status,
-				body: e.response.data,
-				headers: e.response.headers
-			};
-		}
-	}
-
-	public async post<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
+	public async post(url: string, data?: Record<string, any>): Promise<Chain> {
 		return this.send('POST', url, data);
 	}
 
-	public async get<T>(url: string): Promise<HttpClientResponse<T>> {
-		return this.send('GET', url, {});
+	public async get(url: string, params?: Record<string, any>): Promise<Chain> {
+		return this.send('GET', url, {}, params);
 	}
 
-	public async put<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
-		return this.send('PUT', url, data);
+	public async put(url: string, data?: Record<string, any>, params?: Record<string, any>): Promise<Chain> {
+		return this.send('PUT', url, data, params);
 	}
 
-	public async patch<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
-		return this.send('PATCH', url, data);
+	public async patch(url: string, data?: Record<string, any>, params?: Record<string, any>): Promise<Chain> {
+		return this.send('PATCH', url, data, params);
 	}
 
-	public async delete<T>(url: string, data?: Record<string, unknown>): Promise<HttpClientResponse<T>> {
-		return this.send('DELETE', url, data);
+	public async delete(url: string, data?: Record<string, any>, params?: Record<string, any>): Promise<Chain> {
+		return this.send('DELETE', url, data, params);
 	}
 
-	public async logAs(username?: string, password?: string): Promise<HttpClientResponse<any>> {
-		const response = await this.post<any>('/auth/login', { email: username, password: password });
-		if (response.status === HttpStatus.OK) {
-			this.setToken(response.body.token);
+	public async logAs(username?: string, password?: string): Promise<Chain> {
+		const response = await this.post('/auth/login', { email: username, password: password });
+		if (response.statusCode === HttpStatus.OK) {
+			this.setUser(response.json<User>());
 		}
 		return response;
 	}
 
-	public async logAsAdmin(): Promise<HttpClientResponse<any>> {
-		return await this.logAs(config.tests.admin.email, config.tests.admin.password);
-	}
-
-	public async logAsBasic(): Promise<HttpClientResponse<any>> {
-		return await this.logAs(config.tests.basic.email, config.tests.basic.password);
+	public async logAsUser(user: User) {
+		return this.logAs(user.email, user.password);
 	}
 }

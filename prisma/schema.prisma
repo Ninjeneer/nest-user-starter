@@ -11,25 +11,14 @@ generator client {
 }
 
 model User {
-	id 	      String	@id @default(uuid())
-	email	    String	@unique
-	password	String
-	ip	      String?
-	tokens	  Token[]
-	createdAt	DateTime @default(now())
-	updatedAt	DateTime @default(now()) @updatedAt
-	role	    String	 @default("basic")
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  ip        String?
+  token     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  role      String   @default("basic")
 
-	@@map("users")
-}
-
-model Token {
-	id	      String	@id @default(uuid())
-	value	    String	@unique
-	createdAt	DateTime @default(now())
-	expiresAt	DateTime?
-	userID	  String
-	user	    User?	@relation(fields: [userID], references: [id])
-
-	@@map("tokens")
+  @@map("users")
 }

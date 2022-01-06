@@ -7,22 +7,24 @@ import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../src/prisma.service';
 import { SecurityModule } from '../security/security.module';
-import { TokenModule } from '../token/token.module';
 import UserFactory from '../user/user.factory';
 import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
 import chaiSubset from 'chai-subset';
+import chaiExclude from 'chai-exclude';
 
 chai.use(chaiSubset);
+chai.use(chaiExclude);
 
-describe('AuthService', () => {
+describe('AuthService', function () {
+	this.timeout(1000000);
 	let authService: AuthService;
 	let userService: UserService;
 	let module: TestingModule;
 
 	beforeEach(async () => {
 		module = await Test.createTestingModule({
-			imports: [UserModule, AuthModule, SecurityModule, TokenModule],
+			imports: [UserModule, AuthModule, SecurityModule],
 			providers: [AuthService]
 		}).compile();
 
@@ -45,8 +47,13 @@ describe('AuthService', () => {
 			// Create user
 			const createdUser = await userService.create({ email: user.email, password: user.password });
 			delete createdUser.password;
+			delete createdUser.token;
+			delete createdUser.updatedAt;
 			// Log as user
-			expect(await authService.validateUser(user.email, user.password)).containSubset(createdUser);
+			expect(await authService.validateUser(user.email, user.password))
+				.excluding('updatedAt')
+				.containSubset(createdUser)
+				.excluding('updatedAt');
 		});
 	});
 

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { UserRole } from '../user.service';
+import { User as PrismaUser } from '@prisma/client';
 
 export default class User {
 	@ApiProperty()
@@ -19,12 +20,29 @@ export default class User {
 	updatedAt: Date;
 
 	@ApiProperty({ enum: UserRole })
-	role: UserRole | string;
+	role: UserRole;
 
 	@Exclude()
 	password: string;
 
-	constructor(partial: Partial<User>) {
-		Object.assign(this, partial);
+	@ApiProperty()
+	token?: string;
+
+	constructor() {}
+
+	public static from(prismaUser: PrismaUser, options?: { withPassword: boolean }) {
+		if (!prismaUser) {
+			return null;
+		}
+		const user = new User();
+		Object.assign(user, { ...prismaUser });
+		if (options) {
+			if (!options.withPassword) {
+				delete user.password;
+			}
+		} else {
+			delete user.password;
+		}
+		return user;
 	}
 }

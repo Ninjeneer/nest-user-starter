@@ -48,7 +48,7 @@ export class UserController {
 	async create(@Req() request: Request, @Body() createUserDto: CreateUserDTO) {
 		const user = await this.userService.create({ ip: request.ip, ...createUserDto });
 		delete user.password;
-		return new User({ ...user });
+		return user;
 	}
 
 	@Get()
@@ -56,7 +56,7 @@ export class UserController {
 	@ApiOperation({ summary: 'Retrieve all users' })
 	@ApiOkResponse({ description: 'Successfully retrieved user list', type: [User] })
 	async findAll() {
-		return (await this.userService.findAll()).map((user) => new User({ ...user }));
+		return await this.userService.findAll();
 	}
 
 	@Get(':id')
@@ -68,7 +68,7 @@ export class UserController {
 		if (!user) {
 			throw new NotFoundException();
 		}
-		return new User({ ...user });
+		return user;
 	}
 
 	@Patch(':id')
@@ -78,11 +78,10 @@ export class UserController {
 	@ApiOkResponse({ description: 'Successfully updated user', type: User })
 	@ApiConflictResponse({ description: 'User e-mail already exists' })
 	async update(@Req() request: Request, @Param('id') id: string, @Body() updateUserDto: UpdateUserDTO) {
-		if (request.user.role === UserRole.BASIC && updateUserDto.role) {
+		if (request.user.role === UserRole.BASIC && updateUserDto.role && updateUserDto.role !== UserRole.BASIC) {
 			throw new ForbiddenBasicException([ForbiddenBasicActions.UPDATE_ROLE]);
 		}
-		const user = await this.userService.update(id, updateUserDto);
-		return new User({ ...user });
+		return await this.userService.update(id, updateUserDto);
 	}
 
 	@Delete(':id')
@@ -91,7 +90,6 @@ export class UserController {
 	@ApiOkResponse({ description: 'Successfully deleted user', type: User })
 	@ApiNotFoundResponse({ description: 'User does not exists' })
 	async remove(@Param('id') id: string) {
-		const user = await this.userService.remove(id);
-		return new User({ ...user });
+		return await this.userService.remove(id);
 	}
 }
