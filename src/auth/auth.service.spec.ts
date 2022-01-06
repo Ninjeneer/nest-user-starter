@@ -5,7 +5,6 @@ import chai, { expect } from 'chai';
 
 import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
-import { PrismaService } from '../../src/prisma.service';
 import { SecurityModule } from '../security/security.module';
 import UserFactory from '../user/user.factory';
 import { UserModule } from '../user/user.module';
@@ -33,7 +32,7 @@ describe('AuthService', function () {
 	});
 
 	afterEach(async () => {
-		await module.get(PrismaService).$disconnect();
+		//await module.get(PrismaService).$disconnect();
 		await module.close();
 	});
 

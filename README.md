@@ -15,13 +15,23 @@ $ npm install
 ```
 
 ## Configuration
+### Server
 Copy the `src/assets/config-template.json` file as `src/assets/config.json`
 ```bash
 $ cp src/assets/config-template.json src/assets/config.json
 ```
 Feel free to edit settings to match your environment requirements
 
-## Migrate database
+
+### Database
+
+Copy the `prisma/.env.template` file as `prisma/.env`
+```bash
+$ cp prisma/.env.template prisma/.env
+```
+Feel free to edit settings to match your environment requirements
+
+## Push database schema
 
 ```bash
 npx prisma migrate dev
@@ -31,9 +41,6 @@ npx prisma migrate dev
 
 ```bash
 # development
-$ npm run start
-
-# watch mode
 $ npm run start:dev
 
 # production mode
@@ -43,10 +50,7 @@ $ npm run start:prod
 ## Test
 
 ```bash
-# generate context once
-$ npm run test:context
-
-# unit tests
+# all tests
 $ npm run mocha
 
 # e2e tests
