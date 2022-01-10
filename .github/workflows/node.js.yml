@@ -1,0 +1,61 @@
+# Install the Nest server, deploy a Postgres database, push the Prisma database model and run the integration and End-to-End tests
+name: Tests CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest          
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    # User Node JS
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # Setup the PostgreSQL database    
+    - name: Setup PostgreSQL
+      uses: Harmon758/postgresql-action@v1.0.0
+      with:
+        # POSTGRES_DB - name for the default database that is created
+        postgresql db: neststarter
+        # POSTGRES_USER - create the specified user with superuser power
+        postgresql user: nest
+        # POSTGRES_PASSWORD - superuser password
+        postgresql password: password
+    
+    # Copy the config file
+    - name: Copy config file
+      uses: canastro/copy-action@0.0.2
+      with:
+        # Source file
+        source: "src/assets/config.-template.json"
+        # Target file
+        target: "src/assets/config.json"
+        
+    # Copy the Prisma environment variable file
+    - name: Copy prisma env file
+      uses: canastro/copy-action@0.0.2
+      with:
+        # Source file
+        source: "prisma/.env.template"
+        # Target file
+        target: "prisma/.env"
+        
+    - run: npm ci
+    - run: npx prisma db push
+    - run: npm run mocha
