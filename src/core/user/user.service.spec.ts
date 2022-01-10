@@ -4,7 +4,7 @@ import { EmailAlreadyUsedException, UserDoesNotExistException } from '../excepti
 import { Test, TestingModule } from '@nestjs/testing';
 import chai, { expect } from 'chai';
 
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { SecurityModule } from '../security/security.module';
 import UserFactory from './user.factory';
 import { UserService } from './user.service';

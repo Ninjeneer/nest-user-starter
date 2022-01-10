@@ -2,15 +2,17 @@ import chai, { expect } from 'chai';
 
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { User } from '@prisma/client';
-import UserFactory from '../src/user/user.factory';
-import { UserService } from '../src/user/user.service';
+import UserFactory from '../src/core/user/user.factory';
+import { UserService } from '../src/core/user/user.service';
 import chaiSubset from 'chai-subset';
-import { UserModule } from '../src/user/user.module';
-import { AuthModule } from '../src/auth/auth.module';
+import { AuthModule } from '../src/core/auth/auth.module';
 import { Test } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import TestUtils, { getHttpClient } from './utils';
-import { UserRole } from '../src/user/entities/user.entity';
+import { UserRole } from '../src/core/user/entities/user.entity';
+import { UserApiModule } from '../src/api/user-api/user-api.module';
+import { AuthApiModule } from '../src/api/auth-api/auth-api.module';
+import { UserModule } from '../src/core/user/user.module';
 
 chai.use(chaiSubset);
 
@@ -25,7 +27,7 @@ describe('UserController (e2e)', function () {
 
 	this.beforeEach(async () => {
 		const moduleRef = await Test.createTestingModule({
-			imports: [UserModule, AuthModule]
+			imports: [UserApiModule, AuthModule, AuthApiModule, UserModule]
 		}).compile();
 		app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 		app.useGlobalPipes(new ValidationPipe());

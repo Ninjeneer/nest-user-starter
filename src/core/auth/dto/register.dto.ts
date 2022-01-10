@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import config from '../../assets/config.json';
+import config from '../../../assets/config.json';
 
 export default class RegisterDTO {
 	@ApiProperty()

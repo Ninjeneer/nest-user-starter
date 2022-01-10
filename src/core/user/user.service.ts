@@ -2,7 +2,7 @@ import { EmailAlreadyUsedException, UserDoesNotExistException } from '../excepti
 
 import CreateUserDTO from './dto/create-user.dto';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { SecurityService } from '../security/security.service';
 import UpdateUserDTO from './dto/update-user.dto';
 import User from './entities/user.entity';

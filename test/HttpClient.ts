@@ -1,7 +1,7 @@
 import { Chain } from 'light-my-request';
 import { HttpStatus } from '@nestjs/common';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
-import User from 'src/user/entities/user.entity';
+import User from 'src/core/user/entities/user.entity';
 
 export default class HttpClient {
 	private app: NestFastifyApplication;

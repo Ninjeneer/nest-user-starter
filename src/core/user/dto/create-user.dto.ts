@@ -1,7 +1,7 @@
 import { IsEmail, IsIP, IsOptional, Length } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import config from '../../assets/config.json';
+import config from '../../../assets/config.json';
 import { UserRole } from '../entities/user.entity';
 
 export default class CreateUserDTO {

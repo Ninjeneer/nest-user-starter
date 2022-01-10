@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { UserRole } from 'src/user/entities/user.entity';
+import { UserRole } from 'src/core/user/entities/user.entity';
 
 /**
  * This guards avoid users not having specified roles from accessing routes

@@ -1,7 +1,7 @@
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
-import User, { UserRole } from '../src/user/entities/user.entity';
-import UserFactory from '../src/user/user.factory';
-import { UserService } from '../src/user/user.service';
+import User, { UserRole } from '../src/core/user/entities/user.entity';
+import UserFactory from '../src/core/user/user.factory';
+import { UserService } from '../src/core/user/user.service';
 import HttpClient from './HttpClient';
 
 export default class TestUtils {

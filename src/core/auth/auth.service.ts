@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SecurityService } from '../security/security.service';
 import { UserService } from '../user/user.service';
 import { v4 as uuidv4 } from 'uuid';
-import User from 'src/user/entities/user.entity';
+import User from 'src/core/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
