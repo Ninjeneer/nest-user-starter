@@ -43,7 +43,7 @@ jobs:
       uses: canastro/copy-action@0.0.2
       with:
         # Source file
-        source: "src/assets/config.-template.json"
+        source: "src/assets/config-template.json"
         # Target file
         target: "src/assets/config.json"
         
