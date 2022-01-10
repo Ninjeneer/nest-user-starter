@@ -16,7 +16,7 @@ import { Request } from 'express';
 import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { TokenGuard } from '../guards/token.guard';
-import { UserRole, UserService } from './user.service';
+import { UserService } from './user.service';
 import { SelfGuard } from '../guards/self.guard';
 import {
 	ApiBody,
@@ -29,7 +29,7 @@ import {
 } from '@nestjs/swagger';
 import CreateUserDTO from './dto/create-user.dto';
 import UpdateUserDTO from './dto/update-user.dto';
-import User from './entities/user.entity';
+import User, { UserRole } from './entities/user.entity';
 import { ForbiddenBasicActions, ForbiddenBasicException } from '../exceptions/exceptions';
 
 @Controller('users')

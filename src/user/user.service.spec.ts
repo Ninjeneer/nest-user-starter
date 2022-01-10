@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import chaiAsPromised from 'chai-as-promised';
 import chaiSubset from 'chai-subset';
 import User from './entities/user.entity';
+import UserRepository from './user.repository';
 
 chai.use(chaiSubset);
 chai.use(chaiAsPromised);
@@ -37,7 +38,7 @@ describe('UserService', () => {
 	beforeEach(async () => {
 		module = await Test.createTestingModule({
 			imports: [SecurityModule],
-			providers: [UserService, PrismaService]
+			providers: [UserService, PrismaService, UserRepository]
 		}).compile();
 
 		userService = module.get<UserService>(UserService);
@@ -132,7 +133,7 @@ describe('UserService', () => {
 	describe('remove', () => {
 		it('Should delete the created user', async () => {
 			const user = await createUser(userService);
-			expect(await userService.remove(user.id)).containSubset(user);
+			await userService.remove(user.id);
 			expect(await userService.findOne(user.id)).to.be.null;
 		});
 

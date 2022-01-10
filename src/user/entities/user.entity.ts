@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { UserRole } from '../user.service';
 import { User as PrismaUser } from '@prisma/client';
+
+export enum UserRole {
+	BASIC = 'basic',
+	ADMIN = 'admin'
+}
 
 export default class User {
 	@ApiProperty()

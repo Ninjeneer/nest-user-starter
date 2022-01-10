@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 
 import { Observable } from 'rxjs';
 import { Request } from 'express';
-import { UserRole } from '../user/user.service';
+import { UserRole } from '../user/entities/user.entity';
 
 /**
  * This guard avoid users from calling ID based routes on IDs that differs from their

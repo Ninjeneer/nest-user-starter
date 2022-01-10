@@ -6,50 +6,42 @@ import { PrismaService } from '../prisma.service';
 import { SecurityService } from '../security/security.service';
 import UpdateUserDTO from './dto/update-user.dto';
 import User from './entities/user.entity';
-
-export enum UserRole {
-	BASIC = 'basic',
-	ADMIN = 'admin'
-}
+import UserRepository from './user.repository';
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService, private securityService: SecurityService) {}
+	constructor(
+		private prisma: PrismaService,
+		private securityService: SecurityService,
+		private userRepository: UserRepository
+	) {}
 
 	async create(createUserDto: CreateUserDTO): Promise<User> {
 		// Check for existing user
-		let user = await this.prisma.user.findUnique({ where: { email: createUserDto.email } });
+		const user = await this.findOneByEmail(createUserDto.email);
 		if (user) {
 			throw new EmailAlreadyUsedException();
 		}
 		// Hash password
 		const encryptedPassword = this.securityService.hashPassword(createUserDto.password);
 		// Create user
-		user = await this.prisma.user.create({
-			data: {
-				email: createUserDto.email.toLowerCase(),
-				password: encryptedPassword,
-				role: createUserDto.role
-			}
-		});
-		return User.from(user);
+		return await this.userRepository.create({ ...createUserDto, password: encryptedPassword });
 	}
 
 	async findAll(): Promise<User[]> {
-		return (await this.prisma.user.findMany()).map((u) => User.from(u));
+		return await this.userRepository.findAll();
 	}
 
 	async findOne(id: string): Promise<User> {
-		return User.from(await this.prisma.user.findUnique({ where: { id } }));
+		return await this.userRepository.findOne(id);
 	}
 
 	async findOneByEmail(email: string, isAuth = false): Promise<User> {
-		const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-		return User.from(user, { withPassword: isAuth });
+		return await this.userRepository.findByEmail(email, isAuth);
 	}
 
 	async findOneByToken(token: string): Promise<User> {
-		return User.from(await this.prisma.user.findFirst({ where: { token } }));
+		return this.userRepository.findOneByToken(token);
 	}
 
 	async update(id: string, data: UpdateUserDTO): Promise<User> {
@@ -71,7 +63,7 @@ export class UserService {
 			updateData.password = this.securityService.hashPassword(data.password.toString());
 		}
 		// Update the user
-		return User.from(await this.prisma.user.update({ where: { id }, data: updateData }));
+		return await this.userRepository.update(id, updateData);
 	}
 
 	async addToken(id: string, token: string): Promise<User> {
@@ -83,11 +75,11 @@ export class UserService {
 		return User.from(await this.prisma.user.update({ where: { id }, data: { token } }));
 	}
 
-	async remove(id: string): Promise<User> {
+	async remove(id: string): Promise<void> {
 		const user = await this.findOne(id);
 		if (!user) {
 			throw new UserDoesNotExistException();
 		}
-		return User.from(await this.prisma.user.delete({ where: { id } }));
+		await this.userRepository.remove(id);
 	}
 }

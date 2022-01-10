@@ -3,13 +3,14 @@ import chai, { expect } from 'chai';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { User } from '@prisma/client';
 import UserFactory from '../src/user/user.factory';
-import { UserRole, UserService } from '../src/user/user.service';
+import { UserService } from '../src/user/user.service';
 import chaiSubset from 'chai-subset';
 import { UserModule } from '../src/user/user.module';
 import { AuthModule } from '../src/auth/auth.module';
 import { Test } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import TestUtils, { getHttpClient } from './utils';
+import { UserRole } from '../src/user/entities/user.entity';
 
 chai.use(chaiSubset);
 

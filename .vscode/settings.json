@@ -4,5 +4,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": true,
     },
-	"js/ts.implicitProjectConfig.experimentalDecorators": true
+	"js/ts.implicitProjectConfig.experimentalDecorators": true,
+	"typescript.preferences.importModuleSpecifier": "relative"
 }
