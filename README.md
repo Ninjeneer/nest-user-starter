@@ -34,7 +34,7 @@ Feel free to edit settings to match your environment requirements
 ## Push database schema
 
 ```bash
-npx prisma migrate dev
+$ npx prisma db push
 ```
 
 ## Running the app
@@ -59,6 +59,14 @@ $ npm run mocha:e2e
 # test coverage
 $ npm run mocha:cov
 ```
+
+## Internal Dependency Graph
+
+Green = **Core** modules
+
+Blue = **API** modules
+
+![Dependency graph](doc/dependency_graph.png)
 
 ## License
 
