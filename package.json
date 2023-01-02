@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.19",
-    "@nestjs/cli": "^8.2.5",
+    "@nestjs/cli": "^9.1.8",
     "@nestjs/schematics": "^8.0.10",
     "@nestjs/testing": "^8.4.7",
     "@types/bcrypt": "^5.0.0",
@@ -74,7 +74,7 @@
     "supertest": "^6.2.2",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.8.1",
-    "tsconfig-paths": "^3.14.1",
+    "tsconfig-paths": "^4.1.2",
     "typescript": "^4.6.3"
   }
 }
